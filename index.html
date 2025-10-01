@@ -1,0 +1,482 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Sonno x World</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <style>
+    :root {
+      --bg:#f9f9f8;
+      --bg-2:#eef1ff;
+      --pane:rgba(255,255,255,0.88);
+      --border:rgba(15,17,26,0.12);
+      --border-strong:rgba(15,17,26,0.18);
+      --text:#0f111a;
+      --muted:#5f636c;
+      --accent:#2332ff;
+      --accent-soft:#8454ff;
+      --radius:28px;
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{
+      font-family:'Inter','Helvetica Neue',Arial,sans-serif;
+      color:var(--text);
+      background:linear-gradient(140deg,rgba(239,242,255,0.9) 0%,var(--bg) 42%,rgba(244,243,236,0.9) 100%);
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      position:relative;
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      background-image:radial-gradient(circle at 12% -10%,rgba(131,120,255,0.16) 0%,transparent 40%),
+                       radial-gradient(circle at 85% 0%,rgba(82,239,255,0.18) 0%,transparent 48%);
+      pointer-events:none;
+      opacity:0.85;
+    }
+    body::after{
+      content:"";
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.22'/%3E%3C/svg%3E");
+      mix-blend-mode:soft-light;
+      opacity:0.28;
+    }
+    main{
+      width:min(1160px,100%);
+      padding:80px 24px 120px;
+      display:flex;
+      flex-direction:column;
+      gap:56px;
+      position:relative;
+      z-index:1;
+    }
+    header{
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      max-width:720px;
+    }
+    .eyebrow{
+      font-size:13px;
+      letter-spacing:0.32em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    header h1{
+      font-size:clamp(52px,8vw,104px);
+      line-height:1.02;
+      font-weight:600;
+      letter-spacing:-0.02em;
+    }
+    .lede{
+      font-size:clamp(18px,2.5vw,22px);
+      color:var(--muted);
+      max-width:560px;
+      line-height:1.5;
+    }
+    .panel{
+      background:var(--pane);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      padding:34px;
+      box-shadow:0 38px 90px rgba(15,17,26,0.08), inset 0 1px 0 rgba(255,255,255,0.55);
+      backdrop-filter:blur(28px);
+    }
+    .camera-wrap{display:grid;gap:24px;justify-items:center;}
+    .camera-frame{
+      position:relative;
+      width:min(720px,100%);
+      aspect-ratio:16/9;
+      border-radius:calc(var(--radius) - 6px);
+      overflow:hidden;
+      background:rgba(255,255,255,0.65);
+      border:1px solid var(--border-strong);
+      box-shadow:0 24px 70px rgba(15,17,26,0.12);
+    }
+    video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+    .overlay{
+      position:absolute;
+      inset:0;
+      pointer-events:none;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      padding:20px 24px;
+      background:linear-gradient(180deg,rgba(249,249,248,0) 45%,rgba(249,249,248,0.94) 100%);
+    }
+    .count{
+      font-size:40px;
+      font-weight:600;
+      display:flex;
+      flex-direction:column;
+      gap:4px;
+      color:var(--text);
+    }
+    .count span{font-size:64px;line-height:0.95;color:var(--accent);}
+    .count small{
+      font-size:12px;
+      letter-spacing:0.32em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .layers-indicator{font-size:15px;font-weight:500;color:var(--muted);text-align:right;max-width:260px;line-height:1.4;}
+    .status{font-size:13px;color:var(--muted);text-align:center;letter-spacing:0.04em;}
+    button{
+      font-family:inherit;
+      border:none;
+      cursor:pointer;
+    }
+    .primary-btn{
+      padding:16px 30px;
+      border-radius:999px;
+      font-size:13px;
+      letter-spacing:0.24em;
+      text-transform:uppercase;
+      font-weight:600;
+      color:#fff;
+      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
+      box-shadow:0 18px 42px rgba(35,50,255,0.22);
+      transition:transform .18s ease,box-shadow .18s ease,filter .24s ease;
+    }
+    .primary-btn:hover:not([disabled]){
+      transform:translateY(-2px);
+      box-shadow:0 26px 54px rgba(35,50,255,0.28);
+    }
+    .primary-btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none;filter:saturate(0.6);}
+    .panel h2{font-size:26px;font-weight:600;margin:0 0 10px;letter-spacing:-0.01em;}
+    .panel > p{color:var(--muted);font-size:16px;line-height:1.55;margin-bottom:28px;max-width:620px;}
+    .songs{
+      display:grid;
+      gap:22px;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+    }
+    .song-card{
+      position:relative;
+      padding:26px;
+      border-radius:calc(var(--radius) - 10px);
+      background:rgba(255,255,255,0.94);
+      border:1px solid var(--border);
+      box-shadow:0 24px 60px rgba(15,17,26,0.08);
+      display:flex;
+      flex-direction:column;
+      gap:18px;
+      transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
+    }
+    .song-card h3{font-size:20px;font-weight:600;}
+    .song-card p{color:var(--muted);font-size:15px;line-height:1.6;max-width:280px;}
+    .song-card button{
+      align-self:flex-start;
+      padding:13px 22px;
+      border-radius:999px;
+      border:1px solid var(--border-strong);
+      background:rgba(255,255,255,0.85);
+      color:var(--text);
+      font-weight:500;
+      letter-spacing:0.04em;
+      text-transform:uppercase;
+      font-size:12px;
+      transition:background .2s ease,color .2s ease,box-shadow .2s ease,border-color .2s ease;
+    }
+    .song-card button:is(:hover,.is-active){
+      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
+      color:#fff;
+      border-color:transparent;
+      box-shadow:0 16px 32px rgba(35,50,255,0.26);
+    }
+    .song-card.active{
+      border-color:var(--accent);
+      box-shadow:0 28px 60px rgba(35,50,255,0.24);
+      transform:translateY(-3px);
+    }
+    footer{font-size:12px;color:var(--muted);text-align:center;letter-spacing:0.18em;text-transform:uppercase;}
+    @media(max-width:820px){
+      main{gap:48px;padding:64px 20px 96px;}
+      .panel{padding:28px;}
+      .camera-wrap{gap:20px;}
+      .layers-indicator{text-align:left;max-width:none;}
+      .overlay{flex-direction:column;align-items:flex-start;gap:12px;}
+    }
+    @media(max-width:540px){
+      header h1{font-size:clamp(42px,11vw,64px);}
+      .song-card{padding:22px;}
+      .primary-btn{width:100%;justify-content:center;}
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <header>
+      <span class="eyebrow">World protocol experience</span>
+      <h1>Sonno x World</h1>
+      <p class="lede">A layered soundscape that senses presence, unlocking new stems as the crowd gathers.</p>
+    </header>
+
+    <section class="panel camera-wrap">
+      <div class="camera-frame">
+        <video id="webcam" autoplay playsinline muted></video>
+        <div class="overlay">
+          <div class="count"><span id="people-count">0</span><small>people in frame</small></div>
+          <div class="layers-indicator" id="layers-indicator">Select a song to start playback.</div>
+        </div>
+      </div>
+      <button id="start-camera" class="primary-btn">Start camera</button>
+      <p class="status" id="camera-status">Camera idle. Press “Start camera” to begin detection.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Pick a song</h2>
+      <p>0 people = core stem only · 1 person = add layers 1 &amp; 2 · 2 people = add layer 3 · 3+ people = every layer.</p>
+      <div class="songs">
+        <article class="song-card" data-song-id="untitled-project"
+                 data-core="assets/audio/Untitled Project (New Track).wav"
+                 data-layer1="assets/audio/Untitled Project (New Track)_1.wav"
+                 data-layer2="assets/audio/Untitled Project (New Track)_2.wav"
+                 data-layer3="assets/audio/Untitled Project (New Track)_3.wav"
+                 data-layer4="assets/audio/Untitled Project (New Track)_4.wav"
+                 data-layer5="assets/audio/Untitled Project (New Track)_5.wav">
+          <h3>Untitled Project</h3>
+          <p>Gradual post-club bloom that stacks rhythm and texture with every new guest.</p>
+          <button type="button" class="select-song">Play Untitled Project</button>
+        </article>
+
+        <article class="song-card" data-song-id="midnight-parade"
+                 data-core="assets/audio/midnight-parade-core.mp3"
+                 data-layer1="assets/audio/midnight-parade-layer1.mp3"
+                 data-layer2="assets/audio/midnight-parade-layer2.mp3"
+                 data-layer3="assets/audio/midnight-parade-layer3.mp3">
+          <h3>Midnight Parade</h3>
+          <p>Neo-funk bass and syncopated claps morph into brass hits as the room fills up.</p>
+          <button type="button" class="select-song">Play Midnight Parade</button>
+        </article>
+
+        <article class="song-card" data-song-id="pulse-shift"
+                 data-core="assets/audio/pulse-shift-core.mp3"
+                 data-layer1="assets/audio/pulse-shift-layer1.mp3"
+                 data-layer2="assets/audio/pulse-shift-layer2.mp3"
+                 data-layer3="assets/audio/pulse-shift-layer3.mp3">
+          <h3>Pulse Shift</h3>
+          <p>Minimal techno pulse that gains arps, leads, and vocal chops with every extra guest.</p>
+          <button type="button" class="select-song">Play Pulse Shift</button>
+        </article>
+      </div>
+    </section>
+
+    <footer>Built for Sonno ∞ World — keep headphones handy.</footer>
+  </main>
+
+  <script>
+    const video = document.getElementById('webcam');
+    const startBtn = document.getElementById('start-camera');
+    const statusEl = document.getElementById('camera-status');
+    const countEl = document.getElementById('people-count');
+    const layersEl = document.getElementById('layers-indicator');
+
+    let model = null;
+    let stream = null;
+    let detectionTimer = null;
+    let peopleCount = 0;
+
+    class LoopPlayer {
+      constructor(context, url) {
+        this.context = context;
+        this.url = url;
+        this.buffer = null;
+        this.source = null;
+        this.gain = context.createGain();
+        this.gain.connect(context.destination);
+        this.gain.gain.value = 0;
+      }
+      async load() {
+        const response = await fetch(this.url);
+        if (!response.ok) throw new Error('Failed to load audio: ' + this.url);
+        const data = await response.arrayBuffer();
+        this.buffer = await this.context.decodeAudioData(data);
+      }
+      ensureSource() {
+        if (this.source || !this.buffer) return;
+        const node = this.context.createBufferSource();
+        node.buffer = this.buffer;
+        node.loop = true;
+        node.connect(this.gain);
+        node.start();
+        this.source = node;
+      }
+      setActive(active) {
+        this.ensureSource();
+        const target = active ? 1 : 0;
+        this.gain.gain.setTargetAtTime(target, this.context.currentTime, 0.12);
+      }
+      stop() {
+        this.gain.gain.setValueAtTime(0, this.context.currentTime);
+        if (this.source) {
+          try { this.source.stop(); } catch (_) {}
+          this.source.disconnect();
+          this.source = null;
+        }
+      }
+    }
+
+    class SongLayers {
+      constructor(context, card) {
+        this.context = context;
+        this.card = card;
+        const dataset = card.dataset;
+        this.players = [new LoopPlayer(context, dataset.core)];
+        const layerKeys = Object.keys(dataset)
+          .filter(key => /^layer\d+$/.test(key))
+          .sort((a, b) => Number(a.replace('layer', '')) - Number(b.replace('layer', '')));
+        layerKeys.forEach(key => {
+          this.players.push(new LoopPlayer(context, dataset[key]));
+        });
+        this.totalLayers = this.players.length - 1;
+        this.ready = false;
+      }
+      async load() {
+        if (this.ready) return;
+        await Promise.all(this.players.map(p => p.load()));
+        this.ready = true;
+      }
+      applyCount(count) {
+        const totalLayers = this.totalLayers;
+        if (!this.ready) {
+          return { activeLayers: 0, totalLayers };
+        }
+        const activeLayers = computeActiveLayers(count, totalLayers);
+        this.players.forEach((player, index) => {
+          if (index === 0) {
+            player.setActive(true);
+          } else {
+            player.setActive(index <= activeLayers);
+          }
+        });
+        return { activeLayers, totalLayers };
+      }
+      stop() {
+        this.players.forEach(player => player.stop());
+      }
+    }
+
+    function computeActiveLayers(count, layerCount) {
+      if (layerCount <= 0) return 0;
+      if (count <= 0) return 0;
+      if (count === 1) return Math.min(layerCount, 2);
+      if (count === 2) return Math.min(layerCount, 3);
+      return layerCount;
+    }
+
+    function formatLayerStatus(activeLayers, totalLayers) {
+      if (totalLayers === 0 || activeLayers === 0) return 'Core track only';
+      if (activeLayers >= totalLayers) return 'All layers active';
+      if (activeLayers === 1) return 'Layer 1 active';
+      if (activeLayers === 2) return 'Layers 1 + 2 active';
+      return `Layers 1–${activeLayers} active`;
+    }
+
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const songs = new Map();
+    let activeSong = null;
+
+    document.querySelectorAll('.song-card').forEach(card => {
+      const song = new SongLayers(audioContext, card);
+      songs.set(card.dataset.songId, song);
+      const button = card.querySelector('.select-song');
+      button.addEventListener('click', async () => {
+        try {
+          await audioContext.resume();
+          if (!song.ready) {
+            button.textContent = 'Loading…';
+            await song.load();
+          }
+          if (activeSong && activeSong !== song) {
+            activeSong.stop();
+            activeSong.card.classList.remove('active');
+            const prevButton = activeSong.card.querySelector('button');
+            prevButton.classList.remove('is-active');
+            prevButton.textContent = `Play ${activeSong.card.querySelector('h3').textContent}`;
+          }
+          activeSong = song;
+          card.classList.add('active');
+          button.classList.add('is-active');
+          button.textContent = 'Now playing';
+          applyPeopleCount(peopleCount);
+        } catch (err) {
+          console.error(err);
+          statusEl.textContent = 'Audio error: ' + err.message;
+        }
+      });
+    });
+
+    function applyPeopleCount(count) {
+      peopleCount = count;
+      countEl.textContent = count;
+      if (!activeSong) {
+        layersEl.textContent = 'Select a song to start playback.';
+        return;
+      }
+      const { activeLayers, totalLayers } = activeSong.applyCount(count);
+      layersEl.textContent = formatLayerStatus(activeLayers, totalLayers);
+    }
+
+    async function startCamera() {
+      if (stream) return;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
+        video.srcObject = stream;
+        statusEl.textContent = 'Camera active. Analysing…';
+        startBtn.disabled = true;
+        await loadModel();
+        scheduleDetection();
+      } catch (err) {
+        statusEl.textContent = 'Camera error: ' + err.message;
+      }
+    }
+
+    async function loadModel() {
+      if (!model) {
+        statusEl.textContent = 'Loading detection model…';
+        model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
+        statusEl.textContent = 'Model ready. Step into frame to add layers.';
+      }
+    }
+
+    async function analyze() {
+      if (!model || video.readyState < 2) return;
+      const predictions = await model.detect(video);
+      const count = predictions.filter(p => p.class === 'person' && p.score >= 0.55).length;
+      applyPeopleCount(count);
+    }
+
+    function scheduleDetection() {
+      clearTimeout(detectionTimer);
+      detectionTimer = setTimeout(async () => {
+        try {
+          await analyze();
+        } catch (err) {
+          console.error(err);
+        }
+        scheduleDetection();
+      }, 260);
+    }
+
+    startBtn.addEventListener('click', startCamera);
+
+    window.addEventListener('beforeunload', () => {
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
+      songs.forEach(song => song.stop());
+      audioContext.close();
+    });
+  </script>
+</body>
+</html>

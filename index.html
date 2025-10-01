@@ -205,11 +205,7 @@
     <section class="panel">
       <div class="panel-header">
         <span class="eyebrow">World protocol experience</span>
-        <h1>Sonno x World</h1>
         <p class="lede">A layered soundscape that senses presence, unlocking new stems as the crowd gathers.</p>
-      </div>
-      <div class="playback-controls">
-        <button type="button" id="toggle-playback" class="ghost-btn" disabled aria-label="Pause audio"></button>
       </div>
       <div class="songs">
         <article class="song-card" data-song-id="world-1"
@@ -218,7 +214,7 @@
                  data-group2="assets/audio/World%201/World%201%20(Keyboard).mp3|assets/audio/World%201/World%201%20(FX).mp3"
                  data-group3="assets/audio/World%201/World%201%20(Vocals).mp3|assets/audio/World%201/World%201%20(Backing%20Vocals).mp3">
           <h3>World 1</h3>
-          <button type="button" class="select-song">Play World 1</button>
+          <button type="button" class="select-song ghost-btn" aria-label="Toggle World 1 playback"></button>
         </article>
 
         <article class="song-card" data-song-id="world-2"
@@ -227,7 +223,7 @@
                  data-group2="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Guitar).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Strings).mp3"
                  data-group3="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Vocals).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(FX).mp3">
           <h3>World 2</h3>
-          <button type="button" class="select-song">Play World 2</button>
+          <button type="button" class="select-song ghost-btn" aria-label="Toggle World 2 playback"></button>
         </article>
 
         <article class="song-card" data-song-id="world-3"
@@ -236,7 +232,7 @@
                  data-group2="assets/audio/World%203/Paper%20Birds%20(Percussion).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3"
                  data-group3="assets/audio/World%203/Paper%20Birds%20(Vocals).mp3|assets/audio/World%203/Paper%20Birds%20(FX).mp3">
           <h3>World 3</h3>
-          <button type="button" class="select-song">Play World 3</button>
+          <button type="button" class="select-song ghost-btn" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
     </section>
@@ -249,7 +245,6 @@
     const statusEl = document.getElementById('camera-status');
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
-    const togglePlaybackBtn = document.getElementById('toggle-playback');
 
     let model = null;
     let stream = null;
@@ -391,43 +386,52 @@
       return `Base + ${addedStems} added stems`;
     }
 
-    const pauseIconSvg = pauseIcon;
-    const playIconSvg = playIcon;
-
-    document.querySelectorAll('.song-card').forEach(card => {
-      const song = new SongLayers(audioContext, card);
-      songs.set(card.dataset.songId, song);
-      const button = card.querySelector('.select-song');
+    function createToggle(button, song) {
+      const icon = document.createElement('span');
+      icon.classList.add('icon');
+      button.appendChild(icon);
+      updateButtonIcon(button, false);
       button.addEventListener('click', async () => {
         try {
           await ensureCameraStarted();
           await audioContext.resume();
           if (!song.ready) {
+            button.setAttribute('aria-live','polite');
             button.textContent = 'Loading…';
             await song.load();
+            button.textContent = '';
+            button.appendChild(icon);
           }
           if (activeSong && activeSong !== song) {
             activeSong.stop();
             activeSong.card.classList.remove('active');
-            const prevButton = activeSong.card.querySelector('button');
-            prevButton.classList.remove('is-active');
-            prevButton.textContent = `Play ${activeSong.card.querySelector('h3').textContent}`;
+            const previousButton = activeSong.card.querySelector('.select-song');
+            previousButton.classList.remove('is-active');
+            updateButtonIcon(previousButton, false);
+          }
+          if (activeSong === song && !isPaused) {
+            setPaused(true);
+            updateButtonIcon(button, false);
+            return;
           }
           activeSong = song;
-          card.classList.add('active');
+          song.card.classList.add('active');
           button.classList.add('is-active');
-          button.textContent = 'Now playing';
-          togglePlaybackBtn.disabled = false;
-          updateToggleButton();
-          if (isPaused) {
-            statusEl.textContent = 'Audio paused. Press Resume to play.';
-          }
+          setPaused(false);
+          updateButtonIcon(button, true);
           applyPeopleCount(peopleCount);
         } catch (err) {
           console.error(err);
           statusEl.textContent = 'Audio error: ' + err.message;
         }
       });
+    }
+
+    document.querySelectorAll('.song-card').forEach(card => {
+      const song = new SongLayers(audioContext, card);
+      songs.set(card.dataset.songId, song);
+      const button = card.querySelector('.select-song');
+      createToggle(button, song);
     });
 
     function applyPeopleCount(count) {
@@ -439,14 +443,10 @@
       }
       const { activeGroups, totalGroups, baseCount, addedStems } = activeSong.applyCount(count);
       layersEl.textContent = formatLayerStatus(activeGroups, totalGroups, baseCount, addedStems);
-      if (!isPaused) {
+      if (!isPaused && activeSong) {
         statusEl.textContent = 'Audio playing.';
       }
-    }
-
-    function updateToggleButton() {
-      togglePlaybackBtn.innerHTML = isPaused ? playIconSvg : pauseIconSvg;
-      togglePlaybackBtn.setAttribute('aria-label', isPaused ? 'Resume audio' : 'Pause audio');
+      updateAllIcons();
     }
 
     function setPaused(paused) {
@@ -456,18 +456,22 @@
       masterGain.gain.cancelScheduledValues(now);
       masterGain.gain.setValueAtTime(masterGain.gain.value, now);
       masterGain.gain.linearRampToValueAtTime(paused ? 0 : 1, now + 0.25);
-      updateToggleButton();
       statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
+      updateAllIcons();
     }
 
-    togglePlaybackBtn.addEventListener('click', () => {
-      if (!activeSong) {
-        statusEl.textContent = 'Select a song before controlling playback.';
-        return;
-      }
-      setPaused(!isPaused);
-    });
-    updateToggleButton();
+    function updateButtonIcon(button, isActive) {
+      button.classList.toggle('is-active', isActive && !isPaused);
+      button.innerHTML = isPaused || !isActive ? playIcon : pauseIcon;
+    }
+
+    function updateAllIcons() {
+      document.querySelectorAll('.song-card').forEach(card => {
+        const button = card.querySelector('.select-song');
+        const isThisActive = activeSong && activeSong.card === card && !isPaused;
+        updateButtonIcon(button, isThisActive);
+      });
+    }
 
     async function ensureCameraStarted() {
       if (stream) return;

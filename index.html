@@ -93,17 +93,14 @@
       backdrop-filter:blur(28px);
     }
     .experience-panel{display:flex;flex-direction:column;gap:32px;}
-    .camera-stack{display:flex;flex-direction:column;gap:18px;align-items:center;}
+    .camera-stack{display:flex;flex-direction:column;gap:18px;align-items:stretch;}
     .camera-frame{
       position:relative;
-      width:min(720px,100%);
+      width:100%;
       aspect-ratio:16/9;
-      border-radius:calc(var(--radius) - 6px);
       overflow:hidden;
-      background:rgba(255,255,255,0.65);
-      box-shadow:0 24px 70px rgba(15,17,26,0.12);
     }
-    video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
+    video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;}
     .overlay{
       position:absolute;
       inset:0;
@@ -136,23 +133,6 @@
       border:none;
       cursor:pointer;
     }
-    .primary-btn{
-      padding:16px 30px;
-      border-radius:999px;
-      font-size:13px;
-      letter-spacing:0.24em;
-      text-transform:uppercase;
-      font-weight:600;
-      color:#fff;
-      background:linear-gradient(120deg,var(--accent),rgba(111,219,237,0.8));
-      box-shadow:0 18px 42px rgba(111,219,237,0.22);
-      transition:transform .18s ease,box-shadow .18s ease,filter .24s ease;
-    }
-    .primary-btn:hover:not([disabled]){
-      transform:translateY(-2px);
-      box-shadow:0 26px 54px rgba(111,219,237,0.28);
-    }
-    .primary-btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none;filter:saturate(0.6);}
     .panel h2{font-size:26px;font-weight:600;margin:0 0 10px;letter-spacing:-0.01em;}
     .panel > p{color:var(--muted);font-size:16px;line-height:1.55;margin-bottom:28px;max-width:620px;}
     .panel-header{display:flex;flex-direction:column;gap:10px;}
@@ -196,7 +176,6 @@
       transition:border-color .2s ease,box-shadow .2s ease,transform .2s ease;
     }
     .song-card h3{font-size:20px;font-weight:600;}
-    .song-card p{color:var(--muted);font-size:15px;line-height:1.6;max-width:280px;}
     .song-card button{
       align-self:flex-start;
       padding:13px 22px;
@@ -232,7 +211,6 @@
     @media(max-width:540px){
       header h1{font-size:clamp(42px,11vw,64px);}
       .song-card{padding:22px;}
-      .primary-btn{width:100%;justify-content:center;}
     }
   </style>
 </head>
@@ -253,8 +231,7 @@
             <div class="layers-indicator" id="layers-indicator">Select a song to start playback.</div>
           </div>
         </div>
-        <button id="start-camera" class="primary-btn">Start camera</button>
-        <p class="status" id="camera-status">Camera idle. Press “Start camera” to begin detection.</p>
+        <p class="status" id="camera-status">Camera idle. Choose a song to activate detection.</p>
       </div>
 
       <div class="panel-header">
@@ -267,32 +244,30 @@
       </div>
       <div class="songs">
         <article class="song-card" data-song-id="world-1"
-                 data-core="assets/audio/Untitled Project (New Track).wav"
-                 data-layer1="assets/audio/Untitled Project (New Track)_1.wav"
-                 data-layer2="assets/audio/Untitled Project (New Track)_2.wav"
-                 data-layer3="assets/audio/Untitled Project (New Track)_3.wav"
-                 data-layer4="assets/audio/Untitled Project (New Track)_4.wav"
-                 data-layer5="assets/audio/Untitled Project (New Track)_5.wav">
+                 data-base="assets/audio/World%201/World%201%20(Drums).mp3|assets/audio/World%201/World%201%20(Synth).mp3"
+                 data-group1="assets/audio/World%201/World%201%20(Percussion).mp3|assets/audio/World%201/World%201%20(Strings).mp3"
+                 data-group2="assets/audio/World%201/World%201%20(Keyboard).mp3|assets/audio/World%201/World%201%20(FX).mp3"
+                 data-group3="assets/audio/World%201/World%201%20(Vocals).mp3|assets/audio/World%201/World%201%20(Backing%20Vocals).mp3">
           <h3>World 1</h3>
           <button type="button" class="select-song">Play World 1</button>
         </article>
 
-        <article class="song-card" data-song-id="midnight-parade"
-                 data-core="assets/audio/midnight-parade-core.mp3"
-                 data-layer1="assets/audio/midnight-parade-layer1.mp3"
-                 data-layer2="assets/audio/midnight-parade-layer2.mp3"
-                 data-layer3="assets/audio/midnight-parade-layer3.mp3">
-          <h3>Midnight Parade</h3>
-          <button type="button" class="select-song">Play Midnight Parade</button>
+        <article class="song-card" data-song-id="world-2"
+                 data-base="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Bass).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Drums).mp3"
+                 data-group1="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Percussion).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Synth).mp3"
+                 data-group2="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Guitar).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Strings).mp3"
+                 data-group3="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Vocals).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(FX).mp3">
+          <h3>Close Enough to Touch</h3>
+          <button type="button" class="select-song">Play Close Enough to Touch</button>
         </article>
 
-        <article class="song-card" data-song-id="pulse-shift"
-                 data-core="assets/audio/pulse-shift-core.mp3"
-                 data-layer1="assets/audio/pulse-shift-layer1.mp3"
-                 data-layer2="assets/audio/pulse-shift-layer2.mp3"
-                 data-layer3="assets/audio/pulse-shift-layer3.mp3">
-          <h3>Pulse Shift</h3>
-          <button type="button" class="select-song">Play Pulse Shift</button>
+        <article class="song-card" data-song-id="world-3"
+                 data-base="assets/audio/World%203/Paper%20Birds%20(Bass).mp3|assets/audio/World%203/Paper%20Birds%20(Drums).mp3"
+                 data-group1="assets/audio/World%203/Paper%20Birds%20(Percussion).mp3|assets/audio/World%203/Paper%20Birds%20(Keyboard).mp3"
+                 data-group2="assets/audio/World%203/Paper%20Birds%20(Strings).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3"
+                 data-group3="assets/audio/World%203/Paper%20Birds%20(Vocals).mp3|assets/audio/World%203/Paper%20Birds%20(FX).mp3">
+          <h3>Paper Birds</h3>
+          <button type="button" class="select-song">Play Paper Birds</button>
         </article>
       </div>
     </section>
@@ -302,7 +277,6 @@
 
   <script>
     const video = document.getElementById('webcam');
-    const startBtn = document.getElementById('start-camera');
     const statusEl = document.getElementById('camera-status');
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
@@ -311,6 +285,7 @@
     let model = null;
     let stream = null;
     let detectionTimer = null;
+    let cameraStartPromise = null;
     let peopleCount = 0;
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -380,56 +355,71 @@
         this.context = context;
         this.card = card;
         const dataset = card.dataset;
-        this.players = [new LoopPlayer(context, dataset.core, masterGain)];
-        const layerKeys = Object.keys(dataset)
-          .filter(key => /^layer\d+$/.test(key))
-          .sort((a, b) => Number(a.replace('layer', '')) - Number(b.replace('layer', '')));
-        layerKeys.forEach(key => {
-          this.players.push(new LoopPlayer(context, dataset[key], masterGain));
+        const baseSources = dataset.base ? dataset.base.split('|').map(s => s.trim()).filter(Boolean)
+          : (dataset.core ? [dataset.core] : []);
+        this.basePlayers = baseSources.map(src => new LoopPlayer(context, src, masterGain));
+        const groupKeys = Object.keys(dataset)
+          .filter(key => /^group\d+$/.test(key))
+          .sort((a, b) => Number(a.replace('group', '')) - Number(b.replace('group', '')));
+        this.layerGroups = groupKeys.map(key => {
+          return dataset[key]
+            .split('|')
+            .map(s => s.trim())
+            .filter(Boolean)
+            .map(src => new LoopPlayer(context, src, masterGain));
         });
-        this.totalLayers = this.players.length - 1;
         this.ready = false;
       }
       async load() {
         if (this.ready) return;
-        await Promise.all(this.players.map(p => p.load()));
+        const players = [
+          ...this.basePlayers,
+          ...this.layerGroups.flat()
+        ];
+        await Promise.all(players.map(p => p.load()));
         this.ready = true;
       }
       applyCount(count) {
-        const totalLayers = this.totalLayers;
+        const groupsToActivate = Math.min(this.layerGroups.length, Math.max(0, count));
+        const addedStemCount = this.layerGroups
+          .slice(0, groupsToActivate)
+          .reduce((sum, group) => sum + group.length, 0);
         if (!this.ready) {
-          return { activeLayers: 0, totalLayers };
+          return {
+            activeGroups: groupsToActivate,
+            totalGroups: this.layerGroups.length,
+            baseCount: this.basePlayers.length,
+            addedStems: addedStemCount
+          };
         }
-        const activeLayers = computeActiveLayers(count, totalLayers);
-        this.players.forEach((player, index) => {
-          if (index === 0) {
-            player.setActive(true, false);
-          } else {
-            player.setActive(index <= activeLayers, true);
-          }
+        this.basePlayers.forEach(player => player.setActive(true, false));
+        this.layerGroups.forEach((group, index) => {
+          const shouldPlay = index < groupsToActivate;
+          group.forEach(player => player.setActive(shouldPlay, true));
         });
-        return { activeLayers, totalLayers };
+        return {
+          activeGroups: groupsToActivate,
+          totalGroups: this.layerGroups.length,
+          baseCount: this.basePlayers.length,
+          addedStems: addedStemCount
+        };
       }
       stop() {
-        this.players.forEach(player => player.stop());
+        [...this.basePlayers, ...this.layerGroups.flat()].forEach(player => player.stop());
       }
     }
 
-    function computeActiveLayers(count, layerCount) {
-      if (layerCount <= 0) return 0;
-      if (count <= 0) return 0;
-      if (count === 1) return Math.min(layerCount, 2);
-      if (count === 2) return Math.min(layerCount, 3);
-      return layerCount;
-    }
-
-    function formatLayerStatus(activeLayers, totalLayers) {
-      if (totalLayers === 0 || activeLayers === 0) return 'Core track only';
-      if (activeLayers >= totalLayers) return 'All layers active';
-      if (activeLayers === 1) return 'Layer 1 active';
-      if (activeLayers === 2) return 'Layers 1 + 2 active';
-      if (activeLayers === 3) return 'Layers 1 + 2 + 3 active';
-      return `Layers 1–${activeLayers} active`;
+    function formatLayerStatus(activeGroups, totalGroups, baseCount, addedStems) {
+      if (totalGroups === 0) {
+        return baseCount > 0 ? 'Base stems active' : 'No stems loaded';
+      }
+      if (activeGroups === 0) {
+        return baseCount > 0 ? 'Base stems only' : 'No stems active';
+      }
+      if (activeGroups >= totalGroups) {
+        return 'All stems active';
+      }
+      return `Base + ${addedStems} added stems`;
     }
 
     document.querySelectorAll('.song-card').forEach(card => {
@@ -438,6 +428,7 @@
       const button = card.querySelector('.select-song');
       button.addEventListener('click', async () => {
         try {
+          await ensureCameraStarted();
           await audioContext.resume();
           if (!song.ready) {
             button.textContent = 'Loading…';
@@ -474,8 +465,8 @@
         layersEl.textContent = 'Select a song to start playback.';
         return;
       }
-      const { activeLayers, totalLayers } = activeSong.applyCount(count);
-      layersEl.textContent = formatLayerStatus(activeLayers, totalLayers);
+      const { activeGroups, totalGroups, baseCount, addedStems } = activeSong.applyCount(count);
+      layersEl.textContent = formatLayerStatus(activeGroups, totalGroups, baseCount, addedStems);
       if (!isPaused) {
         statusEl.textContent = 'Audio playing.';
       }
@@ -506,13 +497,22 @@
     });
     updateToggleButton();
 
+    async function ensureCameraStarted() {
+      if (stream) return;
+      if (!cameraStartPromise) {
+        cameraStartPromise = startCamera().finally(() => {
+          cameraStartPromise = null;
+        });
+      }
+      return cameraStartPromise;
+    }
+
     async function startCamera() {
       if (stream) return;
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
         video.srcObject = stream;
         statusEl.textContent = 'Camera active. Analysing…';
-        startBtn.disabled = true;
         await loadModel();
         scheduleDetection();
       } catch (err) {
@@ -546,8 +546,6 @@
         scheduleDetection();
       }, 260);
     }
-
-    startBtn.addEventListener('click', startCamera);
 
     window.addEventListener('beforeunload', () => {
       if (stream) {

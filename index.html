@@ -154,6 +154,21 @@
     .primary-btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none;filter:saturate(0.6);}
     .panel h2{font-size:26px;font-weight:600;margin:0 0 10px;letter-spacing:-0.01em;}
     .panel > p{color:var(--muted);font-size:16px;line-height:1.55;margin-bottom:28px;max-width:620px;}
+    .playback-controls{display:flex;justify-content:flex-end;margin:-10px 0 24px;}
+    .ghost-btn{
+      padding:12px 22px;
+      border-radius:999px;
+      border:1px solid rgba(111,219,237,0.42);
+      background:rgba(255,255,255,0.9);
+      color:var(--text);
+      font-weight:600;
+      letter-spacing:0.14em;
+      text-transform:uppercase;
+      font-size:11px;
+      transition:background .2s ease,color .2s ease,box-shadow .2s ease;
+    }
+    .ghost-btn:hover:not([disabled]){background:rgba(111,219,237,0.12);color:var(--text);box-shadow:0 12px 26px rgba(111,219,237,0.18);}
+    .ghost-btn[disabled]{opacity:.45;cursor:not-allowed;border-color:rgba(111,219,237,0.24);}
     .songs{
       display:grid;
       gap:22px;
@@ -235,6 +250,9 @@
     <section class="panel">
       <h2>Pick a song</h2>
       <p>0 people = core stem only · 1 person = add layers 1 &amp; 2 · 2 people = add layer 3 · 3+ people = every layer.</p>
+      <div class="playback-controls">
+        <button type="button" id="toggle-playback" class="ghost-btn" disabled>Pause audio</button>
+      </div>
       <div class="songs">
         <article class="song-card" data-song-id="world-1"
                  data-core="assets/audio/Untitled Project (New Track).wav"
@@ -279,20 +297,30 @@
     const statusEl = document.getElementById('camera-status');
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
+    const togglePlaybackBtn = document.getElementById('toggle-playback');
 
     let model = null;
     let stream = null;
     let detectionTimer = null;
     let peopleCount = 0;
 
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    const masterGain = audioContext.createGain();
+    masterGain.gain.value = 1;
+    masterGain.connect(audioContext.destination);
+    const songs = new Map();
+    let activeSong = null;
+    let isPaused = false;
+
     class LoopPlayer {
-      constructor(context, url) {
+      constructor(context, url, outputNode) {
         this.context = context;
         this.url = url;
         this.buffer = null;
         this.source = null;
         this.gain = context.createGain();
-        this.gain.connect(context.destination);
+        this.outputNode = outputNode || context.destination;
+        this.gain.connect(this.outputNode);
         this.gain.gain.value = 0;
       }
       async load() {
@@ -340,12 +368,12 @@
         this.context = context;
         this.card = card;
         const dataset = card.dataset;
-        this.players = [new LoopPlayer(context, dataset.core)];
+        this.players = [new LoopPlayer(context, dataset.core, masterGain)];
         const layerKeys = Object.keys(dataset)
           .filter(key => /^layer\d+$/.test(key))
           .sort((a, b) => Number(a.replace('layer', '')) - Number(b.replace('layer', '')));
         layerKeys.forEach(key => {
-          this.players.push(new LoopPlayer(context, dataset[key]));
+          this.players.push(new LoopPlayer(context, dataset[key], masterGain));
         });
         this.totalLayers = this.players.length - 1;
         this.ready = false;
@@ -392,10 +420,6 @@
       return `Layers 1–${activeLayers} active`;
     }
 
-    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
-    const songs = new Map();
-    let activeSong = null;
-
     document.querySelectorAll('.song-card').forEach(card => {
       const song = new SongLayers(audioContext, card);
       songs.set(card.dataset.songId, song);
@@ -418,6 +442,11 @@
           card.classList.add('active');
           button.classList.add('is-active');
           button.textContent = 'Now playing';
+          togglePlaybackBtn.disabled = false;
+          updateToggleButton();
+          if (isPaused) {
+            statusEl.textContent = 'Audio paused. Press Resume to play.';
+          }
           applyPeopleCount(peopleCount);
         } catch (err) {
           console.error(err);
@@ -435,7 +464,33 @@
       }
       const { activeLayers, totalLayers } = activeSong.applyCount(count);
       layersEl.textContent = formatLayerStatus(activeLayers, totalLayers);
+      if (!isPaused) {
+        statusEl.textContent = 'Audio playing.';
+      }
     }
+
+    function updateToggleButton() {
+      togglePlaybackBtn.textContent = isPaused ? 'Resume audio' : 'Pause audio';
+    }
+
+    function setPaused(paused) {
+      if (paused === isPaused) return;
+      isPaused = paused;
+      const now = audioContext.currentTime;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(paused ? 0 : 1, now + 0.25);
+      updateToggleButton();
+      statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
+    }
+
+    togglePlaybackBtn.addEventListener('click', () => {
+      if (!activeSong) {
+        statusEl.textContent = 'Select a song before controlling playback.';
+        return;
+      }
+      setPaused(!isPaused);
+    });
 
     async function startCamera() {
       if (stream) return;

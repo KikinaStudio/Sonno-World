@@ -10,6 +10,20 @@
   <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
   <style>
+    @font-face {
+      font-family:'TiemposHeadline';
+      src:url('assets/fonts/Tiempos.otf') format('opentype');
+      font-weight:400;
+      font-style:normal;
+      font-display:swap;
+    }
+    @font-face {
+      font-family:'Lausanne';
+      src:url('assets/fonts/Lausanne.woff') format('woff');
+      font-weight:400;
+      font-style:normal;
+      font-display:swap;
+    }
     :root {
       --bg:#f9f9f8;
       --bg-2:#eef1ff;
@@ -21,10 +35,12 @@
       --accent:#6fdbed;
       --accent-soft:#6fdbed;
       --radius:28px;
+      --font-body:'Lausanne','Inter','Helvetica Neue',Arial,sans-serif;
+      --font-heading:'TiemposHeadline','Times New Roman',serif;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
-      font-family:'Inter','Helvetica Neue',Arial,sans-serif;
+      font-family:var(--font-body);
       color:var(--text);
       background:linear-gradient(140deg,rgba(111,219,237,0.22) 0%,var(--bg) 42%,rgba(111,219,237,0.16) 100%);
       min-height:100vh;
@@ -62,10 +78,12 @@
     }
     header{
       display:flex;
-      flex-direction:column;
-      gap:18px;
-      max-width:720px;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:32px;
+      flex-wrap:wrap;
     }
+    .header-copy{display:flex;flex-direction:column;gap:18px;max-width:720px;}
     .eyebrow{
       font-size:13px;
       letter-spacing:0.32em;
@@ -77,6 +95,7 @@
       line-height:1.02;
       font-weight:600;
       letter-spacing:-0.02em;
+      font-family:var(--font-heading);
     }
     .lede{
       font-size:clamp(18px,2.5vw,22px);
@@ -84,6 +103,7 @@
       max-width:560px;
       line-height:1.5;
     }
+    .header-logo{width:150px;height:auto;flex-shrink:0;}
     .panel{
       background:var(--pane);
       border:1px solid var(--border);
@@ -129,7 +149,7 @@
     .layers-indicator{font-size:15px;font-weight:500;color:var(--muted);text-align:right;max-width:260px;line-height:1.4;}
     .status{font-size:13px;color:var(--muted);text-align:center;letter-spacing:0.04em;}
     button{
-      font-family:inherit;
+      font-family:var(--font-body);
       border:none;
       cursor:pointer;
     }
@@ -208,6 +228,10 @@
       .layers-indicator{text-align:left;max-width:none;}
       .overlay{flex-direction:column;align-items:flex-start;gap:12px;}
     }
+    @media(max-width:720px){
+      header{flex-direction:column;align-items:flex-start;}
+      .header-logo{align-self:flex-end;width:120px;}
+    }
     @media(max-width:540px){
       header h1{font-size:clamp(42px,11vw,64px);}
       .song-card{padding:22px;}
@@ -217,9 +241,12 @@
 <body>
   <main>
     <header>
-      <span class="eyebrow">World protocol experience</span>
-      <h1>Sonno x World</h1>
-      <p class="lede">A layered soundscape that senses presence, unlocking new stems as the crowd gathers.</p>
+      <div class="header-copy">
+        <span class="eyebrow">World protocol experience</span>
+        <h1>Sonno x World</h1>
+        <p class="lede">A layered soundscape that senses presence, unlocking new stems as the crowd gathers.</p>
+      </div>
+      <img class="header-logo" src="assets/Logo/World%20x%20Soono%20Logo.png" alt="Sonno x World logo" />
     </header>
 
     <section class="panel experience-panel">

@@ -18,15 +18,15 @@
       --border-strong:rgba(15,17,26,0.18);
       --text:#0f111a;
       --muted:#5f636c;
-      --accent:#2332ff;
-      --accent-soft:#8454ff;
+      --accent:#6fdbed;
+      --accent-soft:#6fdbed;
       --radius:28px;
     }
     *{box-sizing:border-box;margin:0;padding:0;}
     body{
       font-family:'Inter','Helvetica Neue',Arial,sans-serif;
       color:var(--text);
-      background:linear-gradient(140deg,rgba(239,242,255,0.9) 0%,var(--bg) 42%,rgba(244,243,236,0.9) 100%);
+      background:linear-gradient(140deg,rgba(111,219,237,0.22) 0%,var(--bg) 42%,rgba(111,219,237,0.16) 100%);
       min-height:100vh;
       display:flex;
       justify-content:center;
@@ -37,8 +37,8 @@
       content:"";
       position:fixed;
       inset:0;
-      background-image:radial-gradient(circle at 12% -10%,rgba(131,120,255,0.16) 0%,transparent 40%),
-                       radial-gradient(circle at 85% 0%,rgba(82,239,255,0.18) 0%,transparent 48%);
+      background-image:radial-gradient(circle at 12% -10%,rgba(111,219,237,0.2) 0%,transparent 40%),
+                       radial-gradient(circle at 85% 0%,rgba(111,219,237,0.24) 0%,transparent 48%);
       pointer-events:none;
       opacity:0.85;
     }
@@ -100,7 +100,6 @@
       border-radius:calc(var(--radius) - 6px);
       overflow:hidden;
       background:rgba(255,255,255,0.65);
-      border:1px solid var(--border-strong);
       box-shadow:0 24px 70px rgba(15,17,26,0.12);
     }
     video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);}
@@ -144,13 +143,13 @@
       text-transform:uppercase;
       font-weight:600;
       color:#fff;
-      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
-      box-shadow:0 18px 42px rgba(35,50,255,0.22);
+      background:linear-gradient(120deg,var(--accent),rgba(111,219,237,0.8));
+      box-shadow:0 18px 42px rgba(111,219,237,0.22);
       transition:transform .18s ease,box-shadow .18s ease,filter .24s ease;
     }
     .primary-btn:hover:not([disabled]){
       transform:translateY(-2px);
-      box-shadow:0 26px 54px rgba(35,50,255,0.28);
+      box-shadow:0 26px 54px rgba(111,219,237,0.28);
     }
     .primary-btn[disabled]{opacity:.55;cursor:not-allowed;box-shadow:none;filter:saturate(0.6);}
     .panel h2{font-size:26px;font-weight:600;margin:0 0 10px;letter-spacing:-0.01em;}
@@ -188,14 +187,14 @@
       transition:background .2s ease,color .2s ease,box-shadow .2s ease,border-color .2s ease;
     }
     .song-card button:is(:hover,.is-active){
-      background:linear-gradient(120deg,var(--accent),var(--accent-soft));
-      color:#fff;
+      background:linear-gradient(120deg,var(--accent),rgba(111,219,237,0.8));
+      color:#0f111a;
       border-color:transparent;
-      box-shadow:0 16px 32px rgba(35,50,255,0.26);
+      box-shadow:0 16px 32px rgba(111,219,237,0.26);
     }
     .song-card.active{
       border-color:var(--accent);
-      box-shadow:0 28px 60px rgba(35,50,255,0.24);
+      box-shadow:0 28px 60px rgba(111,219,237,0.24);
       transform:translateY(-3px);
     }
     footer{font-size:12px;color:var(--muted);text-align:center;letter-spacing:0.18em;text-transform:uppercase;}
@@ -237,16 +236,16 @@
       <h2>Pick a song</h2>
       <p>0 people = core stem only · 1 person = add layers 1 &amp; 2 · 2 people = add layer 3 · 3+ people = every layer.</p>
       <div class="songs">
-        <article class="song-card" data-song-id="untitled-project"
+        <article class="song-card" data-song-id="world-1"
                  data-core="assets/audio/Untitled Project (New Track).wav"
                  data-layer1="assets/audio/Untitled Project (New Track)_1.wav"
                  data-layer2="assets/audio/Untitled Project (New Track)_2.wav"
                  data-layer3="assets/audio/Untitled Project (New Track)_3.wav"
                  data-layer4="assets/audio/Untitled Project (New Track)_4.wav"
                  data-layer5="assets/audio/Untitled Project (New Track)_5.wav">
-          <h3>Untitled Project</h3>
+          <h3>World 1</h3>
           <p>Gradual post-club bloom that stacks rhythm and texture with every new guest.</p>
-          <button type="button" class="select-song">Play Untitled Project</button>
+          <button type="button" class="select-song">Play World 1</button>
         </article>
 
         <article class="song-card" data-song-id="midnight-parade"
@@ -311,13 +310,23 @@
         node.start();
         this.source = node;
       }
-      setActive(active) {
+      setActive(active, smooth = true) {
         this.ensureSource();
+        const now = this.context.currentTime;
+        this.gain.gain.cancelScheduledValues(now);
+        if (!smooth) {
+          this.gain.gain.setValueAtTime(active ? 1 : 0, now);
+          return;
+        }
         const target = active ? 1 : 0;
-        this.gain.gain.setTargetAtTime(target, this.context.currentTime, 0.12);
+        const duration = active ? 1.5 : 0.5;
+        this.gain.gain.setValueAtTime(this.gain.gain.value, now);
+        this.gain.gain.linearRampToValueAtTime(target, now + duration);
       }
       stop() {
-        this.gain.gain.setValueAtTime(0, this.context.currentTime);
+        const now = this.context.currentTime;
+        this.gain.gain.cancelScheduledValues(now);
+        this.gain.gain.setValueAtTime(0, now);
         if (this.source) {
           try { this.source.stop(); } catch (_) {}
           this.source.disconnect();
@@ -354,9 +363,9 @@
         const activeLayers = computeActiveLayers(count, totalLayers);
         this.players.forEach((player, index) => {
           if (index === 0) {
-            player.setActive(true);
+            player.setActive(true, false);
           } else {
-            player.setActive(index <= activeLayers);
+            player.setActive(index <= activeLayers, true);
           }
         });
         return { activeLayers, totalLayers };
@@ -379,6 +388,7 @@
       if (activeLayers >= totalLayers) return 'All layers active';
       if (activeLayers === 1) return 'Layer 1 active';
       if (activeLayers === 2) return 'Layers 1 + 2 active';
+      if (activeLayers === 3) return 'Layers 1 + 2 + 3 active';
       return `Layers 1–${activeLayers} active`;
     }
 

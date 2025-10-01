@@ -157,9 +157,9 @@
     .panel > p{color:var(--muted);font-size:16px;line-height:1.55;margin-bottom:28px;max-width:620px;}
     .panel-header{display:flex;flex-direction:column;gap:10px;}
     .panel-header p{margin:0;color:var(--muted);font-size:15px;line-height:1.6;max-width:620px;}
-    .playback-controls{display:flex;justify-content:flex-end;margin:-10px 0 24px;}
+    .playback-controls{display:flex;justify-content:center;margin:0 0 28px;}
     .ghost-btn{
-      padding:12px 22px;
+      padding:16px;
       border-radius:999px;
       border:1px solid rgba(111,219,237,0.42);
       background:rgba(255,255,255,0.9);
@@ -172,9 +172,8 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      width:48px;
-      height:48px;
-      padding:0;
+      width:56px;
+      height:56px;
     }
     .ghost-btn:hover:not([disabled]){background:rgba(111,219,237,0.12);color:var(--text);box-shadow:0 12px 26px rgba(111,219,237,0.18);}
     .ghost-btn[disabled]{opacity:.45;cursor:not-allowed;border-color:rgba(111,219,237,0.24);}
@@ -263,7 +262,6 @@
 
       <div class="panel-header">
         <h2>Pick a song</h2>
-        <p>0 people = core stem only · 1 person = add layers 1 &amp; 2 · 2 people = add layer 3 · 3+ people = every layer.</p>
       </div>
 
       <div class="playback-controls">
@@ -284,17 +282,17 @@
                  data-group1="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Percussion).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Synth).mp3"
                  data-group2="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Guitar).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Strings).mp3"
                  data-group3="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Vocals).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(FX).mp3">
-          <h3>Close Enough to Touch</h3>
-          <button type="button" class="select-song">Play Close Enough to Touch</button>
+          <h3>World 2</h3>
+          <button type="button" class="select-song">Play World 2</button>
         </article>
 
         <article class="song-card" data-song-id="world-3"
-                 data-base="assets/audio/World%203/Paper%20Birds%20(Bass).mp3|assets/audio/World%203/Paper%20Birds%20(Drums).mp3"
-                 data-group1="assets/audio/World%203/Paper%20Birds%20(Percussion).mp3|assets/audio/World%203/Paper%20Birds%20(Keyboard).mp3"
-                 data-group2="assets/audio/World%203/Paper%20Birds%20(Strings).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3"
+                 data-base="assets/audio/World%203/Paper%20Birds%20(Strings).mp3|assets/audio/World%203/Paper%20Birds%20(Keyboard).mp3"
+                 data-group1="assets/audio/World%203/Paper%20Birds%20(Bass).mp3|assets/audio/World%203/Paper%20Birds%20(Drums).mp3"
+                 data-group2="assets/audio/World%203/Paper%20Birds%20(Percussion).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3"
                  data-group3="assets/audio/World%203/Paper%20Birds%20(Vocals).mp3|assets/audio/World%203/Paper%20Birds%20(FX).mp3">
-          <h3>Paper Birds</h3>
-          <button type="button" class="select-song">Play Paper Birds</button>
+          <h3>World 3</h3>
+          <button type="button" class="select-song">Play World 3</button>
         </article>
       </div>
     </section>

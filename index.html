@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <title>Sonno x World</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Noir.png" />
+  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Blanc.png" media="(prefers-color-scheme: dark)" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -97,17 +99,21 @@
       inset:50% auto auto 50%;
       transform:translate(-50%,-50%);
       background:rgba(12,16,24,0.62);
-      color:#e4e8f3;
-      padding:10px 18px;
-      border-radius:999px;
-      font-size:12px;
-      letter-spacing:0.18em;
-      text-transform:uppercase;
+      color:#c7ccd8;
+      padding:14px 22px;
+      border-radius:18px;
+      font-size:14px;
+      letter-spacing:0.02em;
+      text-transform:none;
       text-align:center;
+      font-weight:500;
       backdrop-filter:blur(10px);
       border:1px solid rgba(255,255,255,0.18);
       pointer-events:none;
+      opacity:1;
+      transition:opacity 0.35s ease;
     }
+    .camera-hint.is-hidden{opacity:0;}
     .count{
       font-size:40px;
       font-weight:600;
@@ -184,7 +190,6 @@
       <div class="camera-hint">Camera will activate once a song starts playing.</div>
     </div>
     <div class="control-panel">
-      <p class="status" id="camera-status">Camera idle. Choose a song to activate detection.</p>
       <div class="simulation">
         <div class="simulation-toggle">
           <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Circle Population Simulation</label>
@@ -223,15 +228,19 @@
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
-      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems—turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
+      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
     </div>
   </header>
 
-  <footer>Built for Sonno ∞ World — keep headphones handy.</footer>
+  <footer>Built for Sonno ∞ World, keep headphones handy.</footer>
 
   <script>
     const video = document.getElementById('webcam');
     const statusEl = document.getElementById('camera-status');
+    const cameraHintEl = document.querySelector('.camera-hint');
+    const updateStatus = (message) => {
+      if (statusEl) statusEl.textContent = message;
+    };
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
     const crowdSlider = document.getElementById('crowd-simulator');
@@ -404,6 +413,7 @@
             setPaused(!isPaused);
             return;
           }
+          cameraHintEl?.classList.add('is-hidden');
           activeSong = song;
           song.card.classList.add('active');
           setPaused(false);
@@ -416,7 +426,7 @@
           }
         } catch (err) {
           console.error(err);
-          statusEl.textContent = 'Audio error: ' + err.message;
+          updateStatus('Audio error: ' + err.message);
         }
       });
     }
@@ -433,9 +443,9 @@
       peopleCount = count;
       countEl.textContent = display ?? count;
       if (manual) {
-        statusEl.textContent = `Simulation: ${display ?? count}`;
+        updateStatus(`Simulation: ${display ?? count}`);
       } else if (!isPaused && activeSong) {
-        statusEl.textContent = 'Audio playing.';
+        updateStatus('Audio playing.');
       }
       if (!activeSong) {
         layersEl.textContent = 'Select a song to start playback.';
@@ -456,9 +466,9 @@
       masterGain.gain.linearRampToValueAtTime(paused ? 0 : 1, now + 0.25);
       if (manualOverride) {
         const simulatedLabel = simulationCountEl ? simulationCountEl.textContent : String(peopleCount);
-        statusEl.textContent = paused ? `Simulation paused (${simulatedLabel})` : `Simulation: ${simulatedLabel}`;
+        updateStatus(paused ? `Simulation paused (${simulatedLabel})` : `Simulation: ${simulatedLabel}`);
       } else {
-        statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
+        updateStatus(paused ? 'Audio paused.' : 'Audio playing.');
       }
       updateAllIcons();
     }
@@ -493,19 +503,20 @@
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
         video.srcObject = stream;
-        statusEl.textContent = 'Camera active. Analysing…';
+        updateStatus('Camera active. Analysing…');
+        cameraHintEl?.classList.add('is-hidden');
         await loadModel();
         scheduleDetection();
       } catch (err) {
-        statusEl.textContent = 'Camera error: ' + err.message;
+        updateStatus('Camera error: ' + err.message);
       }
     }
 
     async function loadModel() {
       if (!model) {
-        statusEl.textContent = 'Loading detection model…';
+        updateStatus('Loading detection model…');
         model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
-        statusEl.textContent = 'Model ready. Step into frame to add layers.';
+        updateStatus('Model ready. Step into frame to add layers.');
       }
     }
 
@@ -537,7 +548,7 @@
           if (simulationCountEl) simulationCountEl.textContent = displayValue;
           applyPeopleCount(value, { manual: true, display: displayValue });
         } else {
-          statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
+          updateStatus(stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.');
           applyPeopleCount(peopleCount);
         }
       });
@@ -557,7 +568,7 @@
         crowdSlider.value = '0';
         if (simulationCountEl) simulationCountEl.textContent = '0';
         if (simulationToggle) simulationToggle.checked = false;
-        statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
+        updateStatus(stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.');
         applyPeopleCount(peopleCount);
       });
     }

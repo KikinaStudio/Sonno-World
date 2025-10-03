@@ -125,14 +125,64 @@
     .panel-header .eyebrow{font-size:11px;letter-spacing:0.28em;}
     .panel-header h1{font-family:var(--font-heading);font-size:clamp(48px,6vw,88px);font-weight:600;letter-spacing:-0.02em;}
     .panel-header .lede{font-size:16px;line-height:1.6;color:var(--muted);max-width:560px;}
+    .simulation{
+      max-width:860px;
+      margin:0 auto 24px;
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+      align-items:stretch;
+    }
+    .simulation label{
+      font-size:12px;
+      letter-spacing:0.22em;
+      text-transform:uppercase;
+      color:var(--muted);
+    }
+    .simulation-toggle{display:flex;align-items:center;gap:12px;}
+    .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .simulation-switch input{width:18px;height:18px;cursor:pointer;}
+    .simulation-controls{
+      display:flex;
+      align-items:center;
+      gap:12px;
+    }
+    #crowd-simulator{
+      flex:1;
+      -webkit-appearance:none;
+      appearance:none;
+      height:6px;
+      border-radius:999px;
+      background:rgba(15,17,26,0.1);
+      outline:none;
+    }
+    #crowd-simulator::-webkit-slider-thumb{
+      -webkit-appearance:none;
+      appearance:none;
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:var(--accent);
+      border:none;
+      cursor:pointer;
+    }
+    #crowd-simulator::-moz-range-thumb{
+      width:18px;
+      height:18px;
+      border-radius:50%;
+      background:var(--accent);
+      border:none;
+      cursor:pointer;
+    }
+    .simulation-steps{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 4px;}
     .songs{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:860px;margin:0 auto;}
     .song-card{padding:0;margin:0;border:none;background:transparent;}
     .song-card h3{display:none;}
     .song-trigger{
       display:flex;
       align-items:center;
-      gap:12px;
-      padding:14px 28px;
+      gap:16px;
+      padding:18px 48px;
       border-radius:999px;
       border:1px solid rgba(15,17,26,0.14);
       background:#191919;
@@ -143,7 +193,7 @@
       font-size:12px;
       transition:border-color .2s ease,background .2s ease,color .2s ease;
     }
-    .song-trigger .label{letter-spacing:0.02em;font-size:13px;text-transform:none;font-weight:500;}
+    .song-trigger .label{letter-spacing:0.02em;font-size:14px;text-transform:none;font-weight:500;}
     .song-trigger svg{width:16px;height:16px;fill:currentColor;}
     .song-trigger:hover{border-color:var(--accent);}
     .song-trigger.is-active{background:var(--accent);color:#0b1720;border-color:var(--accent);}
@@ -177,8 +227,16 @@
   </header>
   <main>
     <section class="panel">
-      <div class="panel-header">
-        <p class="lede">This soundscape responds to presence. As each person steps into the circle, new layers of music are revealed, turning individual arrivals into a shared rhythm of belonging. The more we gather, the more the music grows, a living reflection of collective momentum.</p>
+      <div class="simulation">
+        <div class="simulation-toggle">
+          <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Activer la simulation</label>
+        </div>
+        <label for="crowd-simulator">Simuler le nombre de personnes (double-clic pour revenir au mode caméra)</label>
+        <div class="simulation-controls">
+          <input id="crowd-simulator" type="range" min="0" max="3" step="1" value="0" />
+          <span id="simulation-count" class="status" style="margin:0;min-width:52px;text-align:right;">0</span>
+        </div>
+        <div class="simulation-steps"><span>0</span><span>1</span><span>2</span><span>3+</span></div>
       </div>
       <div class="songs">
         <article class="song-card" data-song-id="world-1"
@@ -219,12 +277,16 @@
     const statusEl = document.getElementById('camera-status');
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
+    const crowdSlider = document.getElementById('crowd-simulator');
+    const simulationCountEl = document.getElementById('simulation-count');
+    const simulationToggle = document.getElementById('simulation-toggle');
 
     let model = null;
     let stream = null;
     let detectionTimer = null;
     let cameraStartPromise = null;
     let peopleCount = 0;
+    let manualOverride = false;
 
     const audioContext = new (window.AudioContext || window.webkitAudioContext)();
     const masterGain = audioContext.createGain();
@@ -388,7 +450,13 @@
           activeSong = song;
           song.card.classList.add('active');
           setPaused(false);
-          applyPeopleCount(peopleCount);
+          if (manualOverride && crowdSlider) {
+            const simulatedValue = Number(crowdSlider.value);
+            const displayValue = simulatedValue === 3 ? '3+' : String(simulatedValue);
+            applyPeopleCount(simulatedValue, { manual: true, display: displayValue });
+          } else {
+            applyPeopleCount(peopleCount);
+          }
         } catch (err) {
           console.error(err);
           statusEl.textContent = 'Audio error: ' + err.message;
@@ -403,18 +471,22 @@
       createToggle(button, song);
     });
 
-    function applyPeopleCount(count) {
+    function applyPeopleCount(count, { manual = false, display = null } = {}) {
+      if (!manual && manualOverride) return;
       peopleCount = count;
-      countEl.textContent = count;
+      countEl.textContent = display ?? count;
+      if (manual) {
+        statusEl.textContent = `Simulation: ${display ?? count}`;
+      } else if (!isPaused && activeSong) {
+        statusEl.textContent = 'Audio playing.';
+      }
       if (!activeSong) {
         layersEl.textContent = 'Select a song to start playback.';
+        updateAllIcons();
         return;
       }
       const { activeGroups, totalGroups, baseCount, addedStems } = activeSong.applyCount(count);
       layersEl.textContent = formatLayerStatus(activeGroups, totalGroups, baseCount, addedStems);
-      if (!isPaused && activeSong) {
-        statusEl.textContent = 'Audio playing.';
-      }
       updateAllIcons();
     }
 
@@ -425,7 +497,12 @@
       masterGain.gain.cancelScheduledValues(now);
       masterGain.gain.setValueAtTime(masterGain.gain.value, now);
       masterGain.gain.linearRampToValueAtTime(paused ? 0 : 1, now + 0.25);
-      statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
+      if (manualOverride) {
+        const simulatedLabel = simulationCountEl ? simulationCountEl.textContent : String(peopleCount);
+        statusEl.textContent = paused ? `Simulation paused (${simulatedLabel})` : `Simulation: ${simulatedLabel}`;
+      } else {
+        statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
+      }
       updateAllIcons();
     }
 
@@ -476,7 +553,7 @@
     }
 
     async function analyze() {
-      if (!model || video.readyState < 2) return;
+      if (!model || video.readyState < 2 || manualOverride) return;
       const predictions = await model.detect(video);
       const count = predictions.filter(p => p.class === 'person' && p.score >= 0.55).length;
       applyPeopleCount(count);
@@ -492,6 +569,41 @@
         }
         scheduleDetection();
       }, 260);
+    }
+
+    if (simulationToggle) {
+      simulationToggle.addEventListener('change', () => {
+        manualOverride = simulationToggle.checked;
+        if (manualOverride) {
+          const value = crowdSlider ? Number(crowdSlider.value) : 0;
+          const displayValue = value === 3 ? '3+' : String(value);
+          if (simulationCountEl) simulationCountEl.textContent = displayValue;
+          applyPeopleCount(value, { manual: true, display: displayValue });
+        } else {
+          statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
+          applyPeopleCount(peopleCount);
+        }
+      });
+    }
+
+    if (crowdSlider) {
+      crowdSlider.addEventListener('input', (event) => {
+        const value = Number(event.target.value);
+        if (simulationToggle && !simulationToggle.checked) return;
+        manualOverride = true;
+        if (simulationToggle) simulationToggle.checked = true;
+        const displayValue = value === 3 ? '3+' : String(value);
+        if (simulationCountEl) simulationCountEl.textContent = displayValue;
+        applyPeopleCount(value, { manual: true, display: displayValue });
+      });
+      crowdSlider.addEventListener('dblclick', () => {
+        manualOverride = false;
+        crowdSlider.value = '0';
+        if (simulationCountEl) simulationCountEl.textContent = '0';
+        if (simulationToggle) simulationToggle.checked = false;
+        statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
+        applyPeopleCount(peopleCount);
+      });
     }
 
     window.addEventListener('beforeunload', () => {

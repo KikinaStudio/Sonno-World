@@ -70,7 +70,7 @@
       display:flex;
       justify-content:center;
       align-items:flex-end;
-      padding:0 32px 48px;
+      padding:0 32px;
     }
     .camera-frame{
       position:absolute;
@@ -106,19 +106,20 @@
     .control-panel{
       position:relative;
       z-index:2;
-      width:min(960px,100%);
-      border-radius:28px;
-      padding:36px 40px;
-      background:rgba(10,14,20,0.82);
+      width:min(840px,100%);
+      border-radius:24px;
+      padding:28px 32px;
+      background:rgba(12,16,24,0.82);
       border:1px solid rgba(255,255,255,0.1);
       box-shadow:0 40px 120px rgba(8,10,16,0.45);
       backdrop-filter:blur(24px);
       display:flex;
       flex-direction:column;
       gap:28px;
+      margin-bottom:6vh;
     }
-    .control-panel .status{font-size:12px;color:#dfe3f1;text-align:left;letter-spacing:0.08em;text-transform:uppercase;}
-    .control-panel .lede{font-size:15px;line-height:1.6;color:#c7ccd8;text-align:center;margin:0 auto;max-width:720px;}
+    .control-panel .status{font-size:11px;color:#dfe3f1;text-align:left;letter-spacing:0.16em;text-transform:uppercase;}
+    .control-panel .lede{font-size:15px;line-height:1.6;color:#c7ccd8;text-align:center;margin:0 auto;max-width:640px;}
     .simulation{
       max-width:860px;
       margin:0 auto 24px;
@@ -127,12 +128,7 @@
       gap:12px;
       align-items:stretch;
     }
-    .simulation label{
-      font-size:11px;
-      letter-spacing:0.24em;
-      text-transform:uppercase;
-      color:#dee3ef;
-    }
+    .simulation label{font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#dee3ef;}
     .simulation-toggle{display:flex;align-items:center;gap:12px;}
     .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#cbd2e0;font-weight:500;}
     .simulation-switch input{width:18px;height:18px;cursor:pointer;}
@@ -169,17 +165,17 @@
       cursor:pointer;
     }
     .simulation-steps{display:flex;justify-content:space-between;font-size:11px;color:#9ca4b6;padding:0 4px;}
-    .songs{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:860px;margin:0 auto;}
+    .songs{display:flex;flex-wrap:wrap;gap:16px;justify-content:center;max-width:860px;margin:0 auto;}
     .song-card{padding:0;margin:0;border:none;background:transparent;}
     .song-card h3{display:none;}
     .song-trigger{
       display:flex;
       align-items:center;
-      gap:16px;
-      padding:18px 48px;
+      gap:14px;
+      padding:16px 42px;
       border-radius:999px;
-      border:1px solid rgba(15,17,26,0.14);
-      background:#191919;
+      border:1px solid rgba(255,255,255,0.14);
+      background:#11151c;
       color:#f5f6fa;
       font-weight:500;
       letter-spacing:0.04em;
@@ -187,7 +183,7 @@
       font-size:12px;
       transition:border-color .2s ease,background .2s ease,color .2s ease;
     }
-    .song-trigger .label{letter-spacing:0.02em;font-size:14px;text-transform:none;font-weight:500;}
+    .song-trigger .label{letter-spacing:0.04em;font-size:14px;text-transform:none;font-weight:500;}
     .song-trigger svg{width:16px;height:16px;fill:currentColor;}
     .song-trigger:hover{border-color:var(--accent);}
     .song-trigger.is-active{background:var(--accent);color:#0b1720;border-color:var(--accent);}
@@ -258,7 +254,7 @@
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
-      <p class="lede">This soundscape responds to presence. As each person steps into the circle, new layers of music are revealed, transforming individual arrivals into a shared rhythm of belonging. The more we gather, the more the music grows.</p>
+      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems—turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
     </div>
   </header>
 

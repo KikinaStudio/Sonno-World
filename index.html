@@ -4,8 +4,6 @@
   <meta charset="utf-8" />
   <title>Sonno x World</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Noir.png" />
-  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Blanc.png" media="(prefers-color-scheme: dark)" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -50,9 +48,21 @@
       align-items:stretch;
       overflow-x:hidden;
     }
-    .top-banner{width:100%;background:#eaecf0;border-bottom:1px solid rgba(15,17,26,0.08);color:var(--muted);font-size:10px;letter-spacing:0.32em;text-transform:uppercase;display:flex;justify-content:space-between;align-items:center;padding:7px 24px;}
+    .top-banner{
+      width:100%;
+      background:#eaecf0;
+      border-bottom:1px solid rgba(15,17,26,0.08);
+      color:var(--muted);
+      font-size:11px;
+      letter-spacing:0.32em;
+      text-transform:uppercase;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      padding:10px 32px;
+    }
     .top-banner span{font-weight:500;}
-    .top-banner .brand-logo{height:32px;width:auto;}
+    .top-banner img{height:30px;width:auto;}
     .hero{
       position:relative;
       flex:1;
@@ -87,21 +97,16 @@
       inset:50% auto auto 50%;
       transform:translate(-50%,-50%);
       background:rgba(12,16,24,0.62);
-      color:#c7ccd8;
-      padding:14px 22px;
-      border-radius:18px;
-      font-size:14px;
-      letter-spacing:0.02em;
-      text-transform:none;
+      color:#e4e8f3;
+      padding:10px 18px;
+      border-radius:999px;
+      font-size:12px;
+      letter-spacing:0.18em;
+      text-transform:uppercase;
       text-align:center;
-      font-weight:500;
       backdrop-filter:blur(10px);
       border:1px solid rgba(255,255,255,0.18);
       pointer-events:none;
-      opacity:1;
-      transition:opacity 0.35s ease;
-    }
-    .camera-hint.is-hidden{opacity:0;}
     }
     .count{
       font-size:40px;
@@ -114,9 +119,10 @@
     .count span{font-size:64px;line-height:0.95;color:#f5f6fa;}
     .count small{font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(245,246,250,0.8);}
     .layers-indicator{font-size:15px;font-weight:500;color:#f5f6fa;text-align:right;max-width:260px;line-height:1.4;}
-    .control-panel{position:relative;z-index:2;width:min(700px,100%);border-radius:22px;padding:18px 24px;background:rgba(12,16,24,0.82);border:1px solid rgba(255,255,255,0.12);box-shadow:0 40px 120px rgba(8,10,16,0.45);backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:16px;margin-bottom:3.5vh;}
-    .control-panel .lede{font-size:14px;line-height:1.5;color:#c7ccd8;text-align:center;margin:0 auto;max-width:540px;}
-    .simulation{max-width:640px;margin:0 auto 12px;display:flex;flex-direction:column;gap:8px;align-items:stretch;}
+    .control-panel{position:relative;z-index:2;width:min(740px,100%);border-radius:22px;padding:22px 28px;background:rgba(12,16,24,0.82);border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 120px rgba(8,10,16,0.45);backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:20px;margin-bottom:4vh;}
+    .control-panel .status{font-size:10px;color:#dfe3f1;text-align:left;letter-spacing:0.18em;text-transform:uppercase;}
+    .control-panel .lede{font-size:14px;line-height:1.5;color:#c7ccd8;text-align:center;margin:0 auto;max-width:560px;}
+    .simulation{max-width:680px;margin:0 auto 12px;display:flex;flex-direction:column;gap:8px;align-items:stretch;}
     .simulation label{font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#dee3ef;}
     .simulation-toggle{display:flex;align-items:center;gap:12px;}
     .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#cbd2e0;font-weight:500;}
@@ -166,7 +172,7 @@
 <body>
   <div class="top-banner">
     <span>Sound with purpose</span>
-    <img class="brand-logo" src="assets/Logo/Sonnoxworld_logo.png" alt="Sonno x World" />
+    <img src="assets/Logo/World%20x%20Soono%20Logo.png" alt="Sonno x World logo" />
   </div>
   <header class="hero">
     <div class="camera-frame">
@@ -178,6 +184,7 @@
       <div class="camera-hint">Camera will activate once a song starts playing.</div>
     </div>
     <div class="control-panel">
+      <p class="status" id="camera-status">Camera idle. Choose a song to activate detection.</p>
       <div class="simulation">
         <div class="simulation-toggle">
           <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Circle Population Simulation</label>
@@ -220,15 +227,11 @@
     </div>
   </header>
 
-  <footer>Built for Sonno ∞ World, keep headphones handy.</footer>
+  <footer>Built for Sonno ∞ World — keep headphones handy.</footer>
 
   <script>
     const video = document.getElementById('webcam');
     const statusEl = document.getElementById('camera-status');
-    const cameraHintEl = document.querySelector('.camera-hint');
-    const updateStatus = (message) => {
-      if (statusEl) statusEl.textContent = message;
-    };
     const countEl = document.getElementById('people-count');
     const layersEl = document.getElementById('layers-indicator');
     const crowdSlider = document.getElementById('crowd-simulator');
@@ -401,7 +404,6 @@
             setPaused(!isPaused);
             return;
           }
-          cameraHintEl?.classList.add('is-hidden');
           activeSong = song;
           song.card.classList.add('active');
           setPaused(false);
@@ -431,9 +433,9 @@
       peopleCount = count;
       countEl.textContent = display ?? count;
       if (manual) {
-        updateStatus(`Simulation: ${display ?? count}`);
+        statusEl.textContent = `Simulation: ${display ?? count}`;
       } else if (!isPaused && activeSong) {
-        updateStatus('Audio playing.');
+        statusEl.textContent = 'Audio playing.';
       }
       if (!activeSong) {
         layersEl.textContent = 'Select a song to start playback.';
@@ -454,9 +456,9 @@
       masterGain.gain.linearRampToValueAtTime(paused ? 0 : 1, now + 0.25);
       if (manualOverride) {
         const simulatedLabel = simulationCountEl ? simulationCountEl.textContent : String(peopleCount);
-        updateStatus(paused ? `Simulation paused (${simulatedLabel})` : `Simulation: ${simulatedLabel}`);
+        statusEl.textContent = paused ? `Simulation paused (${simulatedLabel})` : `Simulation: ${simulatedLabel}`;
       } else {
-        updateStatus(paused ? 'Audio paused.' : 'Audio playing.');
+        statusEl.textContent = paused ? 'Audio paused.' : 'Audio playing.';
       }
       updateAllIcons();
     }
@@ -491,20 +493,19 @@
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' }, audio: false });
         video.srcObject = stream;
-        updateStatus('Camera active. Analysing…');
-        cameraHintEl?.classList.add('is-hidden');
+        statusEl.textContent = 'Camera active. Analysing…';
         await loadModel();
         scheduleDetection();
       } catch (err) {
-        updateStatus('Camera error: ' + err.message);
+        statusEl.textContent = 'Camera error: ' + err.message;
       }
     }
 
     async function loadModel() {
       if (!model) {
-        updateStatus('Loading detection model…');
+        statusEl.textContent = 'Loading detection model…';
         model = await cocoSsd.load({ base: 'lite_mobilenet_v2' });
-        updateStatus('Model ready. Step into frame to add layers.');
+        statusEl.textContent = 'Model ready. Step into frame to add layers.';
       }
     }
 
@@ -536,7 +537,7 @@
           if (simulationCountEl) simulationCountEl.textContent = displayValue;
           applyPeopleCount(value, { manual: true, display: displayValue });
         } else {
-          updateStatus(stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.');
+          statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
           applyPeopleCount(peopleCount);
         }
       });
@@ -556,7 +557,7 @@
         crowdSlider.value = '0';
         if (simulationCountEl) simulationCountEl.textContent = '0';
         if (simulationToggle) simulationToggle.checked = false;
-        updateStatus(stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.');
+        statusEl.textContent = stream ? 'Camera active. Analysing…' : 'Camera idle. Choose a song to activate detection.';
         applyPeopleCount(peopleCount);
       });
     }

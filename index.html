@@ -45,7 +45,7 @@
       min-height:100vh;
       display:flex;
       flex-direction:column;
-      align-items:center;
+      align-items:stretch;
       overflow-x:hidden;
     }
     .top-banner{
@@ -64,23 +64,24 @@
     .top-banner span{font-weight:500;}
     .top-banner img{height:30px;width:auto;}
     .hero{
-      width:min(1160px,100%);
-      padding:48px 24px 0;
-      display:flex;
-      flex-direction:column;
-      gap:18px;
-    }
-    .hero .camera-frame{
       position:relative;
+      flex:1;
       width:100%;
-      aspect-ratio:16/9;
-      border-radius:var(--radius);
-      border:1px solid var(--border);
-      background:#fff;
-      box-shadow:0 28px 70px rgba(15,17,26,0.12);
-      overflow:hidden;
+      display:flex;
+      justify-content:center;
+      align-items:flex-end;
+      padding:0 32px 48px;
     }
-    video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;}
+    .camera-frame{
+      position:absolute;
+      inset:0;
+      border:none;
+      border-radius:0;
+      box-shadow:none;
+      overflow:hidden;
+      background:#0b1016;
+    }
+    video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;filter:saturate(0.92);}
     .overlay{
       position:absolute;
       inset:0;
@@ -102,29 +103,22 @@
     .count span{font-size:64px;line-height:0.95;color:#f5f6fa;}
     .count small{font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(245,246,250,0.8);}
     .layers-indicator{font-size:15px;font-weight:500;color:#f5f6fa;text-align:right;max-width:260px;line-height:1.4;}
-    .status{font-size:12px;color:var(--muted);text-align:center;letter-spacing:0.04em;}
-    main{
-      width:min(1160px,100%);
-      padding:48px 24px 120px;
+    .control-panel{
+      position:relative;
+      z-index:2;
+      width:min(960px,100%);
+      border-radius:28px;
+      padding:36px 40px;
+      background:rgba(10,14,20,0.82);
+      border:1px solid rgba(255,255,255,0.1);
+      box-shadow:0 40px 120px rgba(8,10,16,0.45);
+      backdrop-filter:blur(24px);
       display:flex;
       flex-direction:column;
-      gap:32px;
+      gap:28px;
     }
-    .panel{
-      background:var(--pane);
-      border:1px solid var(--border);
-      border-radius:var(--radius);
-      padding:40px 48px;
-      box-shadow:0 24px 60px rgba(15,17,26,0.08);
-      display:flex;
-      flex-direction:column;
-      gap:32px;
-    }
-    .panel-header{display:flex;flex-direction:column;gap:18px;}
-    .header-copy{display:flex;flex-direction:column;gap:14px;}
-    .panel-header .eyebrow{font-size:11px;letter-spacing:0.28em;}
-    .panel-header h1{font-family:var(--font-heading);font-size:clamp(48px,6vw,88px);font-weight:600;letter-spacing:-0.02em;}
-    .panel-header .lede{font-size:16px;line-height:1.6;color:var(--muted);max-width:560px;}
+    .control-panel .status{font-size:12px;color:#dfe3f1;text-align:left;letter-spacing:0.08em;text-transform:uppercase;}
+    .control-panel .lede{font-size:15px;line-height:1.6;color:#c7ccd8;text-align:center;margin:0 auto;max-width:720px;}
     .simulation{
       max-width:860px;
       margin:0 auto 24px;
@@ -134,13 +128,13 @@
       align-items:stretch;
     }
     .simulation label{
-      font-size:12px;
-      letter-spacing:0.22em;
+      font-size:11px;
+      letter-spacing:0.24em;
       text-transform:uppercase;
-      color:var(--muted);
+      color:#dee3ef;
     }
     .simulation-toggle{display:flex;align-items:center;gap:12px;}
-    .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);}
+    .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#cbd2e0;font-weight:500;}
     .simulation-switch input{width:18px;height:18px;cursor:pointer;}
     .simulation-controls{
       display:flex;
@@ -174,7 +168,7 @@
       border:none;
       cursor:pointer;
     }
-    .simulation-steps{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);padding:0 4px;}
+    .simulation-steps{display:flex;justify-content:space-between;font-size:11px;color:#9ca4b6;padding:0 4px;}
     .songs{display:flex;flex-wrap:wrap;gap:20px;justify-content:center;max-width:860px;margin:0 auto;}
     .song-card{padding:0;margin:0;border:none;background:transparent;}
     .song-card h3{display:none;}
@@ -205,8 +199,8 @@
       .panel{padding:32px 24px;}
     }
     @media(max-width:540px){
-      .panel-header h1{font-size:42px;}
-      .song-card{padding:18px;}
+      .control-panel{padding:28px 24px;border-radius:20px;}
+      .song-trigger{padding:16px 28px;}
     }
   </style>
 </head>
@@ -223,10 +217,8 @@
         <div class="layers-indicator" id="layers-indicator">Select a song to start playback.</div>
       </div>
     </div>
-    <p class="status" id="camera-status">Camera idle. Choose a song to activate detection.</p>
-  </header>
-  <main>
-    <section class="panel">
+    <div class="control-panel">
+      <p class="status" id="camera-status">Camera idle. Choose a song to activate detection.</p>
       <div class="simulation">
         <div class="simulation-toggle">
           <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Activer la simulation</label>
@@ -266,11 +258,11 @@
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
-      <p class="lede" style="text-align:center;max-width:720px;margin:18px auto 0;">This soundscape responds to presence. As each person steps into the circle, new layers of music are revealed, transforming individual arrivals into a shared rhythm of belonging. The more we gather, the more the music grows.</p>
-    </section>
+      <p class="lede">This soundscape responds to presence. As each person steps into the circle, new layers of music are revealed, transforming individual arrivals into a shared rhythm of belonging. The more we gather, the more the music grows.</p>
+    </div>
+  </header>
 
-    <footer>Built for Sonno ∞ World — keep headphones handy.</footer>
-  </main>
+  <footer>Built for Sonno ∞ World — keep headphones handy.</footer>
 
   <script>
     const video = document.getElementById('webcam');
@@ -589,7 +581,6 @@
     if (crowdSlider) {
       crowdSlider.addEventListener('input', (event) => {
         const value = Number(event.target.value);
-        if (simulationToggle && !simulationToggle.checked) return;
         manualOverride = true;
         if (simulationToggle) simulationToggle.checked = true;
         const displayValue = value === 3 ? '3+' : String(value);

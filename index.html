@@ -185,7 +185,7 @@
       <video id="webcam" autoplay playsinline muted></video>
       <div class="overlay">
         <div class="count"><span id="people-count">0</span><small>people in frame</small></div>
-        <div class="layers-indicator" id="layers-indicator">Select a song to start playback.</div>
+        <div class="layers-indicator" id="layers-indicator">Songs add layers as people arrive. Please be patient.</div>
       </div>
       <div class="camera-hint">Camera will activate once a song starts playing.</div>
     </div>
@@ -228,7 +228,7 @@
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
-      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
+      <p class="lede">Each song adds new layers as more people enter. Please be patient and listen as it grows.</p>
 a    </div>
   </header>
 
@@ -448,7 +448,7 @@ a    </div>
         updateStatus('Audio playing.');
       }
       if (!activeSong) {
-        layersEl.textContent = 'Select a song to start playback.';
+        layersEl.textContent = 'Songs add layers as people arrive. Please be patient.';
         updateAllIcons();
         return;
       }

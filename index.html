@@ -55,9 +55,11 @@
       background:#eaecf0;
       border-bottom:1px solid rgba(15,17,26,0.08);
       color:var(--muted);
-      font-size:11px;
-      letter-spacing:0.32em;
-      text-transform:uppercase;
+      font-family:var(--font-heading);
+      font-size:13px;
+      letter-spacing:0.08em;
+      line-height:1.4;
+      text-transform:none;
       display:flex;
       justify-content:space-between;
       align-items:center;
@@ -123,15 +125,15 @@
       color:#f5f6fa;
     }
     .count span{font-size:64px;line-height:0.95;color:#f5f6fa;}
-    .count small{font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(245,246,250,0.8);}
+    .count small{font-family:var(--font-heading);font-size:13px;letter-spacing:0.08em;text-transform:none;line-height:1.3;color:rgba(245,246,250,0.8);}
     .layers-indicator{font-size:15px;font-weight:500;color:#f5f6fa;text-align:right;max-width:260px;line-height:1.4;}
     .control-panel{position:relative;z-index:2;width:min(740px,100%);border-radius:22px;padding:22px 28px;background:rgba(12,16,24,0.82);border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 120px rgba(8,10,16,0.45);backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:20px;margin-bottom:4vh;}
-    .control-panel .status{font-size:10px;color:#dfe3f1;text-align:left;letter-spacing:0.18em;text-transform:uppercase;}
+    .control-panel .status{font-family:var(--font-heading);font-size:12px;line-height:1.4;color:#dfe3f1;text-align:left;letter-spacing:0.06em;text-transform:none;}
     .control-panel .lede{font-size:14px;line-height:1.5;color:#c7ccd8;text-align:center;margin:0 auto;max-width:560px;}
     .simulation{max-width:680px;margin:0 auto 12px;display:flex;flex-direction:column;gap:8px;align-items:stretch;}
-    .simulation label{font-size:11px;letter-spacing:0.24em;text-transform:uppercase;color:#dee3ef;}
+    .simulation label{font-family:var(--font-heading);font-size:13px;line-height:1.4;letter-spacing:0.08em;text-transform:none;color:#dee3ef;}
     .simulation-toggle{display:flex;align-items:center;gap:12px;}
-    .simulation-switch{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;color:#cbd2e0;font-weight:500;}
+    .simulation-switch{display:flex;align-items:center;gap:8px;font-family:var(--font-heading);font-size:13px;line-height:1.4;letter-spacing:0.08em;text-transform:none;color:#cbd2e0;font-weight:500;}
     .simulation-switch input{width:18px;height:18px;cursor:pointer;}
     .simulation-controls{display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;position:relative;}
     #crowd-simulator{grid-column:1/-1;-webkit-appearance:none;appearance:none;height:6px;border-radius:999px;background:linear-gradient(90deg,var(--accent) 0%,rgba(255,255,255,0.12) 100%);outline:none;}
@@ -157,14 +159,14 @@
     .songs{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;max-width:700px;margin:0 auto;}
     .song-card{padding:0;margin:0;border:none;background:transparent;}
     .song-card h3{display:none;}
-    .song-trigger{display:flex;align-items:center;gap:12px;padding:14px 36px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#11151c;color:#f5f6fa;font-weight:500;letter-spacing:0.04em;text-transform:uppercase;font-size:11px;transition:border-color .2s ease,background .2s ease,color .2s ease;}
-    .song-trigger .label{letter-spacing:0.04em;font-size:13px;text-transform:none;font-weight:500;}
+    .song-trigger{display:flex;align-items:center;gap:12px;padding:14px 36px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#11151c;color:#f5f6fa;font-family:var(--font-heading);font-weight:500;letter-spacing:0.08em;text-transform:none;font-size:13px;line-height:1.3;transition:border-color .2s ease,background .2s ease,color .2s ease;}
+    .song-trigger .label{letter-spacing:0.02em;font-size:14px;text-transform:none;font-weight:500;}
     .song-trigger svg{width:16px;height:16px;fill:currentColor;}
     .song-trigger:hover{border-color:var(--accent);}
     .song-trigger.is-active{background:var(--accent);color:#0b1720;border-color:var(--accent);}
-    footer{font-size:12px;color:var(--muted);text-align:center;letter-spacing:0.18em;text-transform:uppercase;}
+    footer{font-family:var(--font-heading);font-size:13px;color:var(--muted);text-align:center;letter-spacing:0.08em;text-transform:none;line-height:1.5;}
     @media(max-width:720px){
-      .top-banner{padding:10px 20px;font-size:10px;letter-spacing:0.26em;}
+      .top-banner{padding:10px 20px;font-size:12px;letter-spacing:0.08em;}
       .top-banner img{height:26px;}
       .hero{padding:36px 20px 0;}
       .panel{padding:32px 24px;}
@@ -192,7 +194,7 @@
     <div class="control-panel">
       <div class="simulation">
         <div class="simulation-toggle">
-          <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Circle Population Simulation</label>
+          <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Circle population simulation</label>
         </div>
         <div class="simulation-controls">
           <input id="crowd-simulator" type="range" min="0" max="3" step="1" value="0" aria-label="Circle population" title="Double-click to return to camera detection" />
@@ -229,7 +231,7 @@
         </article>
       </div>
       <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
-a    </div>
+    </div>
   </header>
 
   <footer>Built for Sonno⎪World, keep headphones handy.</footer>

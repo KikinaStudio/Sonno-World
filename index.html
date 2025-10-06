@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
   <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+  <script defer src="assets/js/ascii-overlay.js"></script>
   <style>
     @font-face {
       font-family:'TiemposHeadline';
@@ -211,10 +212,10 @@
         </article>
 
         <article class="song-card" data-song-id="world-2"
-                 data-base="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Keyboard).mp3"
-                 data-group1="assets/audio/World%202/Close%20Enough%20to%20Touch%20(FX).mp3"
-                 data-group2="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Drums).mp3"
-                 data-group3="assets/audio/World%202/Close%20Enough%20to%20Touch%20(Bass).mp3|assets/audio/World%202/Close%20Enough%20to%20Touch%20(Synth).mp3">
+                 data-base="assets/audio/World%202/World%203%20(Guitar).mp3"
+                 data-group1="assets/audio/World%202/World%203%20(Strings).mp3"
+                 data-group2="assets/audio/World%202/World%203%20(Keyboard).mp3|assets/audio/World%202/World%203%20(Synth).mp3"
+                 data-group3="assets/audio/World%202/World%203%20(Drums).mp3|assets/audio/World%202/World%203%20(Vocals).mp3|assets/audio/World%202/World%203%20(Backing%20Vocals).mp3">
           <h3>World 2</h3>
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 2 playback"></button>
         </article>
@@ -246,6 +247,17 @@ a    </div>
     const crowdSlider = document.getElementById('crowd-simulator');
     const simulationCountEl = document.getElementById('simulation-count');
     const simulationToggle = document.getElementById('simulation-toggle');
+
+    const asciiOverlay = typeof attachAsciiToVideo === 'function' ? attachAsciiToVideo(video, {
+      color: '#3AA0FF',
+      fontSize: 16,
+      density: 8,
+      invert: false,
+      showVideo: false
+    }) : null;
+    if (asciiOverlay) {
+      window.asciiOverlay = asciiOverlay;
+    }
 
     let model = null;
     let stream = null;

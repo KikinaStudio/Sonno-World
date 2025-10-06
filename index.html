@@ -167,12 +167,25 @@
     @media(max-width:720px){
       .top-banner{padding:7px 20px;font-size:10px;letter-spacing:0.26em;}
       .top-banner img{height:18px;}
-      .hero{padding:36px 20px 0;}
-      .panel{padding:32px 24px;}
+      .hero{padding:28px 18px 0;}
     }
-    @media(max-width:540px){
-      .control-panel{padding:28px 24px;border-radius:20px;}
-      .song-trigger{padding:16px 28px;}
+    @media(max-width:560px){
+      .overlay{padding:14px 16px;}
+      .count{font-size:32px;}
+      .count span{font-size:48px;}
+      .count small{font-size:11px;letter-spacing:0.2em;}
+      .layers-indicator{font-size:13px;text-align:left;max-width:100%;}
+      .control-panel{padding:18px 16px;border-radius:18px;gap:14px;margin-bottom:2vh;}
+      .simulation{gap:6px;}
+      .simulation-controls{gap:10px;}
+      #crowd-simulator{height:5px;}
+      .simulation-steps{font-size:10px;padding:0;margin-top:4px;}
+      .songs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;max-width:none;}
+      .song-card{width:100%;}
+      .song-trigger{padding:10px 0;font-size:10px;letter-spacing:0.12em;}
+      .song-trigger svg{display:none;}
+      .song-trigger .label{font-size:12px;}
+      .control-panel .lede{font-size:12px;}
     }
   </style>
 </head>
@@ -249,17 +262,35 @@
     const simulationCountEl = document.getElementById('simulation-count');
     const simulationToggle = document.getElementById('simulation-toggle');
 
+    const densityQuery = window.matchMedia('(max-width: 600px)');
     let asciiOverlay = null;
+    let densityWatcherAttached = false;
+
+    const ensureDensityWatcher = () => {
+      if (densityWatcherAttached) return;
+      const listener = (event) => {
+        if (!asciiOverlay) return;
+        asciiOverlay.setOptions({ density: event.matches ? 8 : 6 });
+      };
+      if (densityQuery.addEventListener) {
+        densityQuery.addEventListener('change', listener);
+      } else if (densityQuery.addListener) {
+        densityQuery.addListener(listener);
+      }
+      densityWatcherAttached = true;
+    };
+
     const initAsciiOverlay = () => {
       if (asciiOverlay || typeof attachAsciiToVideo !== 'function') return;
       asciiOverlay = attachAsciiToVideo(video, {
         color: '#3BDFED',
         fontSize: 16,
-        density: 6,
+        density: densityQuery.matches ? 8 : 6,
         invert: false,
         showVideo: false
       });
       if (asciiOverlay) {
+        ensureDensityWatcher();
         window.asciiOverlay = asciiOverlay;
       }
     };

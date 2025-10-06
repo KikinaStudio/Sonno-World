@@ -62,10 +62,10 @@
       display:flex;
       justify-content:space-between;
       align-items:center;
-      padding:10px 32px;
+      padding:7px 32px;
     }
     .top-banner span{font-weight:500;}
-    .top-banner img{height:50px;width:auto;}
+    .top-banner img{height:36px;width:auto;}
     .hero{
       position:relative;
       flex:1;
@@ -165,8 +165,8 @@
     .song-trigger.is-active{background:var(--accent);color:#0b1720;border-color:var(--accent);}
     footer{font-size:12px;color:var(--muted);text-align:center;letter-spacing:0.18em;text-transform:uppercase;}
     @media(max-width:720px){
-      .top-banner{padding:10px 20px;font-size:10px;letter-spacing:0.26em;}
-      .top-banner img{height:26px;}
+      .top-banner{padding:7px 20px;font-size:10px;letter-spacing:0.26em;}
+      .top-banner img{height:18px;}
       .hero{padding:36px 20px 0;}
       .panel{padding:32px 24px;}
     }
@@ -229,6 +229,7 @@
           <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
         </article>
       </div>
+      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm. The more we gather, the richer the music becomes.</p>
       <p class="lede">Each song adds new layers as more people enter. Please be patient and listen as it grows.</p>
     </div>
   </header>
@@ -252,7 +253,7 @@
     const initAsciiOverlay = () => {
       if (asciiOverlay || typeof attachAsciiToVideo !== 'function') return;
       asciiOverlay = attachAsciiToVideo(video, {
-        color: '#3AA0FF',
+        color: '#3BDFED',
         fontSize: 16,
         density: 8,
         invert: false,

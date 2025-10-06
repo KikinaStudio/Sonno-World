@@ -1,7 +1,7 @@
 (function (global) {
   const CHARSET = ' .:-=+*#%@';
   const DEFAULTS = {
-    color: '#3AA0FF',
+    color: '#3BDFED',
     fontSize: 16,
     density: 8,
     invert: false,

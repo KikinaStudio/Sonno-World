@@ -1,18 +1,19 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <title>Sonno⎪World</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Noir.png" />
-  <link rel="icon" type="image/png" href="assets/Favicon/Favicon Kikina Blanc.png" media="(prefers-color-scheme: dark)" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-  <script defer src="assets/js/ascii-overlay.js"></script>
-  <style>
+<meta charset="utf-8"/>
+<title>Sonno⎪World</title>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<link href="assets/Favicon/Favicon Kikina Noir.png" rel="icon" type="image/png"/>
+<link href="assets/Favicon/Favicon Kikina Blanc.png" media="(prefers-color-scheme: dark)" rel="icon" type="image/png"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<script defer="" src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.13.0/dist/tf.min.js"></script>
+<script defer="" src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+<script defer="" src="assets/js/ascii-overlay.js"></script>
+<style>
     @font-face {
       font-family:'TiemposHeadline';
       src:url('assets/fonts/Tiempos.otf') format('opentype');
@@ -180,9 +181,9 @@
       .simulation-controls{gap:10px;}
       #crowd-simulator{height:5px;}
       .simulation-steps{font-size:10px;padding:0;margin-top:4px;}
-      .songs{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:12px;max-width:none;}
-      .song-card{width:100%;}
-      .song-trigger{padding:12px 14px;font-size:11px;letter-spacing:0.1em;gap:8px;justify-content:center;}
+      .songs{display:flex;gap:10px;max-width:none;justify-content:center;flex-wrap:nowrap;}
+      .song-card{flex:1 1 0;min-width:0;}
+      .song-trigger{width:100%;padding:12px 16px;font-size:11px;letter-spacing:0.1em;gap:8px;justify-content:center;}
       .song-trigger svg{display:block;width:14px;height:14px;}
       .song-trigger .label{font-size:12px;}
       .control-panel .lede{font-size:12px;}
@@ -190,66 +191,50 @@
   </style>
 </head>
 <body>
-  <div class="top-banner">
-    <span>Sound with purpose</span>
-    <img src="assets/Logo/Sonnoxworld_logo.png" alt="Sonno⎪World logo" />
-  </div>
-  <header class="hero">
-    <div class="camera-frame">
-      <video id="webcam" autoplay playsinline muted></video>
-      <div class="overlay">
-        <div class="count"><span id="people-count">0</span><small>people in frame</small></div>
-        <div class="layers-indicator" id="layers-indicator">Like every piece of music, each track begins with a quiet introduction. <br> Give it a moment, more layers unfold as the composition awakens.
+<div class="top-banner">
+<span>Sound with purpose</span>
+<img alt="Sonno⎪World logo" src="assets/Logo/Sonnoxworld_logo.png"/>
+</div>
+<header class="hero">
+<div class="camera-frame">
+<video autoplay="" id="webcam" muted="" playsinline=""></video>
+<div class="overlay">
+<div class="count"><span id="people-count">0</span><small>people in frame</small></div>
+<div class="layers-indicator" id="layers-indicator">Like every piece of music, each track begins with a quiet introduction. <br/> Give it a moment, more layers unfold as the composition awakens.
         </div>
-      </div>
-      <div class="camera-hint">Camera will activate once you click play on one of the three demo songs below.</div>
-    </div>
-    <div class="control-panel">
-      <div class="simulation">
-        <div class="simulation-toggle">
-          <label class="simulation-switch"><input type="checkbox" id="simulation-toggle" />Circle Population Simulation</label>
-        </div>
-        <div class="simulation-controls">
-          <input id="crowd-simulator" type="range" min="0" max="3" step="1" value="0" aria-label="Circle population" title="Double-click to return to camera detection" />
-          <span id="simulation-count" class="status" style="margin:0;min-width:52px;text-align:right;">0</span>
-        </div>
-        <div class="simulation-steps"><span>0</span><span>1</span><span>2</span><span>3+</span></div>
-      </div>
-      <div class="songs">
-        <article class="song-card" data-song-id="world-1"
-                 data-base="assets/audio/World%201/Breathing%20in%20Color%20(Keyboard).mp3"
-                 data-group1="assets/audio/World%201/Breathing%20in%20Color%20(Bass).mp3"
-                 data-group2="assets/audio/World%201/Breathing%20in%20Color%20(Woodwinds).mp3"
-                 data-group3="assets/audio/World%201/Breathing%20in%20Color%20(Drums).mp3|assets/audio/World%201/Breathing%20in%20Color%20(FX).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Guitar).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Percussion).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Synth).mp3">
-          <h3>World 1</h3>
-          <button type="button" class="select-song song-trigger" aria-label="Toggle World 1 playback"></button>
-        </article>
-
-        <article class="song-card" data-song-id="world-2"
-                 data-base="assets/audio/World%203/Paper%20Birds%20(Strings).mp3|assets/audio/World%203/Paper%20Birds%20(Keyboard).mp3"
-                 data-group1="assets/audio/World%203/Paper%20Birds%20(Bass).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3"
-                 data-group2="assets/audio/World%203/Paper%20Birds%20(FX).mp3"
-                 data-group3="assets/audio/World%203/Paper%20Birds%20(Drums).mp3|assets/audio/World%203/Paper%20Birds%20(Percussion).mp3">
-          <h3>World 2</h3>
-          <button type="button" class="select-song song-trigger" aria-label="Toggle World 2 playback"></button>
-        </article>
-
-        <article class="song-card" data-song-id="world-3"
-                 data-base="assets/audio/World%202/World%203%20(Guitar).mp3"
-                 data-group1="assets/audio/World%202/World%203%20(Strings).mp3"
-                 data-group2="assets/audio/World%202/World%203%20(Keyboard).mp3|assets/audio/World%202/World%203%20(Synth).mp3"
-                 data-group3="assets/audio/World%202/World%203%20(Drums).mp3|assets/audio/World%202/World%203%20(Vocals).mp3|assets/audio/World%202/World%203%20(Backing%20Vocals).mp3">
-          <h3>World 3</h3>
-          <button type="button" class="select-song song-trigger" aria-label="Toggle World 3 playback"></button>
-        </article>
-      </div>
-      <p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm.</p>
-    </div>
-  </header>
-
-  <footer>Built for Sonno⎪World, keep headphones handy.</footer>
-
-  <script>
+</div>
+<div class="camera-hint">Camera will activate once you click play on one of the three demo songs below.</div>
+</div>
+<div class="control-panel">
+<div class="simulation">
+<div class="simulation-toggle">
+<label class="simulation-switch"><input id="simulation-toggle" type="checkbox"/>Circle Population Simulation</label>
+</div>
+<div class="simulation-controls">
+<input aria-label="Circle population" id="crowd-simulator" max="3" min="0" step="1" title="Double-click to return to camera detection" type="range" value="0"/>
+<span class="status" id="simulation-count" style="margin:0;min-width:52px;text-align:right;">0</span>
+</div>
+<div class="simulation-steps"><span>0</span><span>1</span><span>2</span><span>3+</span></div>
+</div>
+<div class="songs">
+<article class="song-card" data-base="assets/audio/World%201/Breathing%20in%20Color%20(Keyboard).mp3" data-group1="assets/audio/World%201/Breathing%20in%20Color%20(Bass).mp3" data-group2="assets/audio/World%201/Breathing%20in%20Color%20(Woodwinds).mp3" data-group3="assets/audio/World%201/Breathing%20in%20Color%20(Drums).mp3|assets/audio/World%201/Breathing%20in%20Color%20(FX).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Guitar).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Percussion).mp3|assets/audio/World%201/Breathing%20in%20Color%20(Synth).mp3" data-song-id="world-1">
+<h3>World 1</h3>
+<button aria-label="Toggle World 1 playback" class="select-song song-trigger" data-song-index="1" type="button"></button>
+</article>
+<article class="song-card" data-base="assets/audio/World%203/Paper%20Birds%20(Strings).mp3|assets/audio/World%203/Paper%20Birds%20(Keyboard).mp3" data-group1="assets/audio/World%203/Paper%20Birds%20(Bass).mp3|assets/audio/World%203/Paper%20Birds%20(Synth).mp3" data-group2="assets/audio/World%203/Paper%20Birds%20(FX).mp3" data-group3="assets/audio/World%203/Paper%20Birds%20(Drums).mp3|assets/audio/World%203/Paper%20Birds%20(Percussion).mp3" data-song-id="world-2">
+<h3>World 2</h3>
+<button aria-label="Toggle World 2 playback" class="select-song song-trigger" data-song-index="2" type="button"></button>
+</article>
+<article class="song-card" data-base="assets/audio/World%202/World%203%20(Guitar).mp3" data-group1="assets/audio/World%202/World%203%20(Strings).mp3" data-group2="assets/audio/World%202/World%203%20(Keyboard).mp3|assets/audio/World%202/World%203%20(Synth).mp3" data-group3="assets/audio/World%202/World%203%20(Drums).mp3|assets/audio/World%202/World%203%20(Vocals).mp3|assets/audio/World%202/World%203%20(Backing%20Vocals).mp3" data-song-id="world-3">
+<h3>World 3</h3>
+<button aria-label="Toggle World 3 playback" class="select-song song-trigger" data-song-index="3" type="button"></button>
+</article>
+</div>
+<p class="lede">This soundscape senses presence. Each person steps into the circle, unlocking new stems, turning single arrivals into a shared rhythm.</p>
+</div>
+</header>
+<footer>Built for Sonno⎪World, keep headphones handy.</footer>
+<script>
     const video = document.getElementById('webcam');
     const statusEl = document.getElementById('camera-status');
     const cameraHintEl = document.querySelector('.camera-hint');
@@ -312,11 +297,43 @@
     masterGain.gain.value = 1;
     masterGain.connect(audioContext.destination);
     const songs = new Map();
+    const songsContainer = document.querySelector('.songs');
+    let songLayoutRaf = null;
     let activeSong = null;
     let isPaused = false;
 
     const pauseIcon = '<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" fill="none"><rect x="4" y="3" width="3" height="12" rx="1" fill="currentColor"/><rect x="11" y="3" width="3" height="12" rx="1" fill="currentColor"/></svg>';
     const playIcon = '<svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg" fill="none"><path d="M6.25 3.7c0-.78.85-1.26 1.52-.84l7 4.3c.66.4.66 1.36 0 1.76l-7 4.3a1 1 0 0 1-1.52-.84V3.7Z" fill="currentColor"/></svg>';
+
+    function scheduleSongLayoutCheck() {
+      if (!songsContainer) return;
+      if (songLayoutRaf) cancelAnimationFrame(songLayoutRaf);
+      songLayoutRaf = requestAnimationFrame(() => {
+        songLayoutRaf = null;
+        refreshSongButtonCompaction();
+      });
+    }
+
+    function refreshSongButtonCompaction() {
+      if (!songsContainer) return;
+      const buttons = songsContainer.querySelectorAll('.song-trigger');
+      let changed = false;
+      buttons.forEach(button => {
+        const shouldCompact = button.offsetWidth < 120;
+        if (shouldCompact) {
+          if (button.dataset.compact !== 'true') {
+            button.dataset.compact = 'true';
+            changed = true;
+          }
+        } else if (button.dataset.compact) {
+          delete button.dataset.compact;
+          changed = true;
+        }
+      });
+      if (changed) {
+        updateAllIcons();
+      }
+    }
 
     class LoopPlayer {
       constructor(context, url, outputNode) {
@@ -444,7 +461,12 @@
     function createToggle(button, song) {
       const label = song.card.querySelector('h3').textContent;
       button.dataset.label = label;
+      if (!button.dataset.shortLabel) {
+        const index = button.dataset.songIndex || (label.match(/\d+/) ? label.match(/\d+/)[0] : '');
+        button.dataset.shortLabel = index ? `W.${index}` : label.slice(0, 2).toUpperCase();
+      }
       updateButtonIcon(button, false);
+      scheduleSongLayoutCheck();
       button.addEventListener('click', async () => {
         try {
           await ensureCameraStarted();
@@ -491,6 +513,9 @@
       createToggle(button, song);
     });
 
+    scheduleSongLayoutCheck();
+    window.addEventListener('resize', scheduleSongLayoutCheck);
+
     function applyPeopleCount(count, { manual = false, display = null } = {}) {
       if (!manual && manualOverride) return;
       peopleCount = count;
@@ -528,9 +553,11 @@
 
     function updateButtonIcon(button, isActive) {
       const label = button.dataset.label || '';
+      const shortLabel = button.dataset.shortLabel || label;
+      const displayLabel = button.dataset.compact === 'true' ? shortLabel : label;
       const icon = (isPaused || !isActive) ? playIcon : pauseIcon;
       button.classList.toggle('is-active', isActive && !isPaused);
-      button.innerHTML = icon + `<span class="label">${label}</span>`;
+      button.innerHTML = icon + `<span class="label">${displayLabel}</span>`;
     }
 
     function updateAllIcons() {

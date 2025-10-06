@@ -248,15 +248,24 @@ a    </div>
     const simulationCountEl = document.getElementById('simulation-count');
     const simulationToggle = document.getElementById('simulation-toggle');
 
-    const asciiOverlay = typeof attachAsciiToVideo === 'function' ? attachAsciiToVideo(video, {
-      color: '#3AA0FF',
-      fontSize: 16,
-      density: 8,
-      invert: false,
-      showVideo: false
-    }) : null;
-    if (asciiOverlay) {
-      window.asciiOverlay = asciiOverlay;
+    let asciiOverlay = null;
+    const initAsciiOverlay = () => {
+      if (asciiOverlay || typeof attachAsciiToVideo !== 'function') return;
+      asciiOverlay = attachAsciiToVideo(video, {
+        color: '#3AA0FF',
+        fontSize: 16,
+        density: 8,
+        invert: false,
+        showVideo: false
+      });
+      if (asciiOverlay) {
+        window.asciiOverlay = asciiOverlay;
+      }
+    };
+    if (typeof attachAsciiToVideo === 'function') {
+      initAsciiOverlay();
+    } else {
+      window.addEventListener('ascii-overlay-ready', initAsciiOverlay, { once: true });
     }
 
     let model = null;

@@ -248,4 +248,15 @@
   }
 
   global.attachAsciiToVideo = attachAsciiToVideo;
+  if (global && typeof global.dispatchEvent === 'function') {
+    try {
+      global.dispatchEvent(new Event('ascii-overlay-ready'));
+    } catch (err) {
+      if (global.document && typeof global.document.createEvent === 'function') {
+        const legacyEvent = global.document.createEvent('Event');
+        legacyEvent.initEvent('ascii-overlay-ready', true, true);
+        global.dispatchEvent(legacyEvent);
+      }
+    }
+  }
 })(typeof window !== 'undefined' ? window : this);

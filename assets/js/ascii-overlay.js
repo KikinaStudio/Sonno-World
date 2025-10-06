@@ -63,31 +63,29 @@
 
     video.insertAdjacentElement('afterend', canvas);
 
-    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    let ctx = canvas.getContext('2d', { willReadFrequently: true });
+    if (!ctx) ctx = canvas.getContext('2d');
+    if (!ctx) {
+      console.error('ASCII overlay: 2D context not available.');
+      return null;
+    }
     const sampleCanvas = document.createElement('canvas');
-    const sampleCtx = sampleCanvas.getContext('2d');
+    let sampleCtx = sampleCanvas.getContext('2d', { willReadFrequently: true });
+    if (!sampleCtx) sampleCtx = sampleCanvas.getContext('2d');
+    if (!sampleCtx) {
+      console.error('ASCII overlay: unable to create sampling context.');
+      return null;
+    }
 
     let dims = null;
     let rafId = null;
     let running = true;
     let charSequence = toCharArray(config.invert);
     let charCount = charSequence.length;
-    let charWidth = 0;
-    let charHeight = config.fontSize;
     let managedStream = null;
 
     const originalOpacity = video.style.opacity;
     const originalVisibility = video.style.visibility;
-
-    function updateFontMetrics() {
-      ctx.save();
-      ctx.font = `${config.fontSize}px monospace`;
-      ctx.textBaseline = 'top';
-      const metrics = ctx.measureText('M');
-      charWidth = metrics.width || config.fontSize * 0.6;
-      charHeight = config.fontSize;
-      ctx.restore();
-    }
 
     function updateCharSequence() {
       charSequence = toCharArray(config.invert);
@@ -148,16 +146,18 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
       }
 
-      ctx.save();
-      const scaleX = dims.cellWidth / charWidth;
-      const scaleY = dims.cellHeight / charHeight;
-      ctx.scale(scaleX, scaleY);
-      ctx.font = `${config.fontSize}px monospace`;
+      const cellWidth = dims.cellWidth;
+      const cellHeight = dims.cellHeight;
+      const adjustedFontSize = Math.max(6, Math.min(config.fontSize, cellHeight * 1.5));
+      ctx.font = `${adjustedFontSize}px 'Courier New', monospace`;
       ctx.textBaseline = 'top';
       ctx.fillStyle = config.color;
 
+      const yStep = cellHeight;
+      const xStep = cellWidth;
+
       for (let y = 0; y < rows; y += 1) {
-        const yOffset = y * charHeight;
+        const yPos = y * yStep;
         for (let x = 0; x < cols; x += 1) {
           const idx = (y * cols + x) * 4;
           const r = imageData[idx];
@@ -165,10 +165,9 @@
           const b = imageData[idx + 2];
           const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
           const charIndex = Math.min(charCount - 1, Math.round((luminance / 255) * (charCount - 1)));
-          ctx.fillText(charSequence[charIndex], x * charWidth, yOffset);
+          ctx.fillText(charSequence[charIndex], x * xStep, yPos);
         }
       }
-      ctx.restore();
 
       rafId = requestAnimationFrame(render);
     }
@@ -178,7 +177,6 @@
     }
 
     updateCharSequence();
-    updateFontMetrics();
     updateVideoVisibility();
 
     function rememberStream(stream) {
@@ -220,7 +218,6 @@
         }
 
         updateCharSequence();
-        updateFontMetrics();
         updateVideoVisibility();
         updateDimensions();
         return api;

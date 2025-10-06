@@ -127,6 +127,8 @@
     .count span{font-size:64px;line-height:0.95;color:#f5f6fa;}
     .count small{font-size:12px;letter-spacing:0.32em;text-transform:uppercase;color:rgba(245,246,250,0.8);}
     .layers-indicator{font-size:15px;font-weight:500;color:#f5f6fa;text-align:right;max-width:260px;line-height:1.4;}
+    .overlay__copy{font-size:16px;line-height:1.5;color:#f5f6fa;max-width:320px;}
+    .panel-intro{display:none;font-size:16px;line-height:1.5;color:#f5f6fa;text-align:center;margin:18px auto 0;max-width:320px;}
     .control-panel{position:relative;z-index:2;width:min(740px,100%);border-radius:22px;padding:22px 28px;background:rgba(12,16,24,0.82);border:1px solid rgba(255,255,255,0.1);box-shadow:0 40px 120px rgba(8,10,16,0.45);backdrop-filter:blur(24px);display:flex;flex-direction:column;gap:20px;margin-bottom:4vh;}
     .control-panel .status{font-size:10px;color:#dfe3f1;text-align:left;letter-spacing:0.18em;text-transform:uppercase;}
     .control-panel .lede{font-size:14px;line-height:1.5;color:#c7ccd8;text-align:center;margin:0 auto;max-width:560px;}
@@ -171,10 +173,12 @@
       .hero{padding:28px 18px 0;}
     }
     @media(max-width:560px){
-      .overlay{padding:14px 16px;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:10px;}
-      .count{font-size:34px;}
-      .count span{font-size:52px;}
-      .count small{font-size:11px;letter-spacing:0.24em;}
+      .overlay{padding:14px 16px;flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:12px;}
+      .overlay__copy{display:none;}
+      .panel-intro{display:block;font-size:14px;line-height:1.6;margin:12px auto 0;max-width:90%;color:#f5f6fa;}
+      .count{font-size:30px;}
+      .count span{font-size:46px;}
+      .count small{font-size:10px;letter-spacing:0.24em;}
       .layers-indicator{font-size:13px;text-align:left;max-width:100%;margin-top:auto;}
       .control-panel{padding:16px 16px;border-radius:18px;gap:16px;margin-bottom:1.5vh;}
       .simulation{gap:6px;}
@@ -198,12 +202,9 @@
 <header class="hero">
 <div class="camera-frame">
 <video autoplay="" id="webcam" muted="" playsinline=""></video>
-<div class="overlay">
-<div class="count"><span id="people-count">0</span><small>people in frame</small></div>
-<div class="layers-indicator" id="layers-indicator">Like every piece of music, each track begins with a quiet introduction. <br/> Give it a moment, more layers unfold as the composition awakens.
-        </div>
-</div>
-<div class="camera-hint">Camera will activate once you click play on one of the three demo songs below.</div>
+<div class="overlay"><div class="layers-indicator overlay__copy" id="layers-indicator">Like every piece of music, each track begins with a quiet introduction. <br/> Give it a moment, more layers unfold as the composition unfolds.
+        </div><div class="count"><span id="people-count">0</span><small>people in frame</small></div></div>
+<div class="camera-hint">Camera will activate once you click play on one of the three demo songs below.</div><p class="panel-intro">Like every piece of music, each track begins with a quiet introduction. <br/>Give it a moment, more layers unfold as the composition unfolds.</p>
 </div>
 <div class="control-panel">
 <div class="simulation">

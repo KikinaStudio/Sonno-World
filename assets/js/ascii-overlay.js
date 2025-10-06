@@ -3,7 +3,7 @@
   const DEFAULTS = {
     color: '#3BDFED',
     fontSize: 16,
-    density: 8,
+    density: 6,
     invert: false,
     showVideo: false,
     autostart: false
